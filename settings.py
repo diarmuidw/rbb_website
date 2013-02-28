@@ -31,7 +31,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql", # Add "postgresql_psycopg2", "postgresql", "mysql", "sqlite3" or "oracle".
         "NAME": "django_db",                       # Or path to database file if using sqlite3.
         "USER": "djangouser",                             # Not used with sqlite3.
-        "PASSWORD": "xxxxxx",                         # Not used with sqlite3.
+        "PASSWORD": "X573GpMa",                         # Not used with sqlite3.
         "HOST": "",                             # Set to empty string for localhost. Not used with sqlite3.
         "PORT": "",                             # Set to empty string for default. Not used with sqlite3.
     }
@@ -112,7 +112,7 @@ MIDDLEWARE_CLASSES = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-ROOT_URLCONF = "website.urls"
+ROOT_URLCONF = "rbb_website.urls"
 
 TEMPLATE_DIRS = [
     os.path.join(PROJECT_ROOT, "templates"),

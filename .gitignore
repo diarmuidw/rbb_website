@@ -2,7 +2,7 @@
 local_settings.py
 # C extensions
 *.so
-
+*.*~
 # Packages
 *.egg
 *.egg-info

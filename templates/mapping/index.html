@@ -9,7 +9,7 @@
 	/* Some basic happy style */
 	body{margin:50px 0px; padding:0px;text-align:center;}
 	input {font-size:18px;}
-	#myMap{width: 600px; height: 600px;margin:auto;margin-top:20px;}
+	#myMap{width: 1000px; height: 600px;margin:auto;margin-top:20px;}
 
 </style>
  
@@ -113,7 +113,8 @@
  		//alert(markerFile)	
 		$.getJSON(markerFile, function(data) {
 			//alert('after getjson')
-			// loop all the markers
+			//// loop all the markers
+			//alert(data.markers)
 			$.each(data.markers, function(i,item){
 				//alert('after each')
 				// add marker to map
@@ -127,10 +128,10 @@
 	 * Load marker to map
 	 */
 	function loadMarker(markerData){
-		
+		//alert(markerData['lat']);
 		// create new marker location
 		//console.log(markerData['lat'] + ', ' +  markerData['long'])
-		var myLatlng = new google.maps.LatLng(markerData['lat'],-1 * markerData['long']);
+		var myLatlng = new google.maps.LatLng(markerData['lat'], markerData['long']);
 		img = imagegreen;
 		if (markerData['data1'] == "0")
 		{
@@ -171,7 +172,7 @@
 			
 		}
 
-		
+		//img = imageyellow;
 		// create new marker				
 		var marker = new google.maps.Marker({
 		    id: markerData['id'],
@@ -182,7 +183,7 @@
 			//shadow: shadow
 
 		});
-
+		//alert('after marker');
 		// add marker to list used later to get content and additional marker information
 		markerList[marker.id] = marker;
 
@@ -293,7 +294,7 @@
 	<h1>Rapid Broadband Geo data</h1> 
 
 	<!-- Map Placeholder -->
-	<div id="myMap"></div> 
+	<div id="myMap" ></div> 
 	
 	<form action="/mapping/search" method="post">{% csrf_token %}
         {{ form.as_p }}
