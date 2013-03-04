@@ -103,7 +103,8 @@
 		loadMarkers();
 	}
  
- 
+    alldata = ''
+
 	/**
 	 * Load markers via ajax request from server
 	 */
@@ -115,6 +116,9 @@
 			//alert('after getjson')
 			//// loop all the markers
 			//alert(data.markers)
+            alldata = data.markers;
+            //alert(alldata[1]['voip']);
+            
 			$.each(data.markers, function(i,item){
 				//alert('after each')
 				// add marker to map
@@ -123,6 +127,16 @@
 			});
 		});	
 	}
+
+    function getobject(id){
+    
+    for(var k in alldata) {
+          if (alldata[k]['id'] == id) {
+            return alldata[k];
+        
+          }
+    }   
+    }
 
 	/**
 	 * Load marker to map
@@ -156,14 +170,14 @@
 
 		 */
 		
-		if (markerData['data2'] == "1")
+		if (markerData['billing'] == "True")
 		{
 			img = imagegreen;
 			
 		}
-		if (markerData['data2'] == "2")
+		if (markerData['billing'] == "False")
 		{
-			img = imageblue;
+			img = imageyellow;
 			
 		}
 		if (markerData['data2'] == "3")
@@ -193,13 +207,15 @@
 			
 			// show marker when clicked
 			showMarker(marker.id, marker.title);
-
+            //console.log(getobject(marker.id));
+            console.log(marker.id);
+           
 		});
 
 		// add event when marker window is closed to reset map location
 		google.maps.event.addListener(infowindow,'closeclick', function() { 
-			map.setCenter(defaultLatlng);
-			map.setZoom(defaultZoom);
+			//map.setCenter(defaultLatlng);
+			//map.setZoom(defaultZoom);
 		}); 	
 		}//end of data1==0
 	}	
@@ -211,14 +227,21 @@
 		
 		// get marker information from marker list
 		var marker = markerList[markerId];
-		
+		 //console.log(alldata);
+        thisobject = getobject(marker.id)
 		// check if marker was found
 		if( marker ){
 			// get marker detail information from server
 			//$.get( 'data/' + marker.id + '.html' , function(data) {
 			$.get( '/site_media/static/data/test.html' , function(data) {
 				// show marker window
-				infowindow.setContent("<h2>" + markerTitle + "</h2><p><a target ='_blank' href='http://192.168.1.141/customers/"+ markerId +"'>Click here</a></p>");
+                info = "<h2>" + markerTitle + "</h2>"
+                info = info + "<h3>" + thisobject['voip'] + "</h3>"
+                info = info + "<h3>" + thisobject['ip'] + "</h3>"
+                
+                info = info + "<p><a target ='_blank' href='http://192.168.1.141/customers/"+ markerId +"'>Click here</a></p>"
+                
+				infowindow.setContent(info);
 				infowindow.open(map,marker);
 			});	
 		}else{

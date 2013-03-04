@@ -32,7 +32,7 @@ def getjson(request):
     print request.GET
     #j = '{"markers": [{"name": "ssss", "long": 9.1066, "lat": 51.627, "data1": "1", "id": "2", "data2": "1"}, {"name": "cccccc", "long": 8.9751, "lat": 51.6123, "data1": "1", "id": "3", "data2": "2"}, {"name": "jjjjj", "long": 3.15, "lat": 51.548, "data1": "1", "id": "6", "data2": "3"}, {"name": "jj;lk;k;", "long": 9.0942, "lat": 51.5588, "data1": "1", "id": "9", "data2": "1"}, {"name": "iiiii", "long": 3.1333, "lat": 51.5881, "data1": "1", "id": "12", "data2": "1"}]}'
     
-    #data = Customer.objects.filter(gps_longitude__lte = -9.0)
+    #data = Customer.objects.filter(gps_longitude__lte = -9.0).filter(voip_number__startswith='02')
     data = Customer.objects.all()
     markers = {}
     rows = []
@@ -44,6 +44,9 @@ def getjson(request):
         a['id'] = str(d.customer_id)
         a['data1'] = str(1)
         a['data2'] = str(2)
+        a['billing'] = str(d.billing_active)
+        a['ip'] = str(d.ip)
+        a['voip'] = str(d.voip_number)
         rows.append(a)
         
 
