@@ -31,7 +31,7 @@ def search(request):
                 except:
                     customer_name = ''
                     pass
-                billing_active = ''
+                billing_active = '0'
                 try:
                     billing_active = request.POST['billing_active']
                    
@@ -39,9 +39,10 @@ def search(request):
                     billing_active = ''
                     pass   
                     
-                online = ''
+                show_online = '0'
                 try:
-                    online = request.POST['online']
+                    print 'aaaaaaaaaaaaaaaaaaa'
+                    show_online = request.POST['show_online']
                    
                 except:
                     online = ''
@@ -49,7 +50,7 @@ def search(request):
                     
                                         
                                      
-                qs = 'customer_name=%s&billing_active=%s&online=%s'%(customer_name, billing_active,online)
+                qs = 'customer_name=%s&billing_active=%s&show_online=%s'%(customer_name, billing_active,show_online)
                 print qs
                 return render(request, 'mapping/index.html', {
                 'form': form, 'qs': qs
@@ -76,19 +77,29 @@ def getjson(request):
         name = request.GET['customer_name']
         data = Customer.objects.filter(last_name__contains=name)
     except:
-        data = Customer.objects.filter(voip_number__startswith='0')
+        data = Customer.objects.all()
         pass
+     
     try:
         billing_active = request.GET['billing_active']
-        data = data.filter(billing_active__exact=billing_active)
+        if billing_active == 'on':
+            data = data.filter(billing_active__exact='1')
+        else:
+            data = data.filter(billing_active__exact='0')
+        
     except:
         
         pass        
     try:
-        online = request.GET['online']
-        data = data.filter(ip__contains='9')
-    except:
+        show_online = request.GET['show_online']
+        print 'online'
+        if show_online == 'on':
+            data = data.filter(ip__contains='9')
+        else:
+            pass
         
+        
+    except:
         pass     
     #data = Customer.objects.all()
     markers = {}
