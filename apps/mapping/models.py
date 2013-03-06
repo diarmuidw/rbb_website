@@ -10,6 +10,13 @@ class Customer(models.Model):
     voip_number         = models.CharField(max_length=20, null=True, default='')
     ip                  = models.IPAddressField(unique=True, null=True, default='')
     billing_active      = models.NullBooleanField(null=True, default=0)
+    install_date		= models.DateTimeField(auto_now_add=False)
+    cancel_date		    = models.DateTimeField(auto_now_add=False)
+    sector_id           = models.CharField(max_length=50, null=True)
+    sector_ip           = models.IPAddressField(unique=False, null=True, default='')
+    take_down_unit      = models.NullBooleanField(null=True, default=0)
+    will_come_back      = models.NullBooleanField(null=True, default=0)
+    no_signal           = models.NullBooleanField(null=True, default=0)
     def __unicode__(self):
         return (self.first_name + " " + self.last_name)
     
@@ -30,4 +37,5 @@ class Detail(models.Model):
     sip_reg             = models.FloatField(null=True)
     on_call		= models.BooleanField(null=False, default=0)
     reg_ip              = models.IPAddressField(unique=False, null=True, default='')
+    signal_strength = models.FloatField(null=True)
 

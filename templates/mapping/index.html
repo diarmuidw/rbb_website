@@ -314,15 +314,14 @@
  
 <body onload="loadMap()"> 
 	<!-- Title -->
-	<h1>Rapid Broadband Geo data</h1> 
-
-	<!-- Map Placeholder -->
-	<div id="myMap" ></div> 
-	
 	<form action="/mapping/search" method="post">{% csrf_token %}
         {{ form.as_p }}
      <input type="submit" value="Submit" />
     </form>
+	<!-- Map Placeholder -->
+	<div id="myMap" ></div> 
+	
+
 
 
 </body>

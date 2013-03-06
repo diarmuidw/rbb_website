@@ -1,15 +1,19 @@
 from django.shortcuts import render_to_response
 from django.shortcuts import render
-
+from django.views.decorators.csrf import csrf_exempt
 from mapping.forms import CustomerForm
 from mapping.models import Customer
 
 import anyjson
+@csrf_exempt
 def index(request):
-
-    return render_to_response('mapping/index.html', {
+    form = CustomerForm() # An unbound form
+    return render_to_response('mapping/index.html', {'form':form
     })
     
+    
+    
+@csrf_exempt
 def search(request):
     print "search"
     if request.method == 'POST': # If the form has been submitted...
@@ -18,22 +22,59 @@ def search(request):
                 # Process the data in form.cleaned_data
                 # ...
                 #return HttpResponseRedirect('/thanks/') # Redirect after POST
-                return render_to_response("hey hey")
+                print request.POST
+                customer_name = ''
+                
+                try:
+                    customer_name = request.POST['customer_name']
+                   
+                except:
+                    customer_name = ''
+                    pass
+                billing_active = ''
+                try:
+                    billing_active = request.POST['billing_active']
+                   
+                except:
+                    billing_active = ''
+                    pass                    
+                qs = 'customer_name=%s&billing_active=%s'%(customer_name, billing_active)
+                print qs
+                return render(request, 'mapping/index.html', {
+                'form': form, 'qs': qs
+                })
     else:
         form = CustomerForm() # An unbound form
     
-    j = '{"markers": [{"name": "Rosaleen Mc Carthy", "long": 9.1066, "lat": 51.627, "data1": "1", "id": "2", "data2": "1"}, {"name": "Brian + Louise  Elphick", "long": 8.9751, "lat": 51.6123, "data1": "1", "id": "3", "data2": "2"}, {"name": "Graham and Sally Crowley", "long": 3.15, "lat": 51.548, "data1": "1", "id": "6", "data2": "3"}, {"name": "Eithne O Donovan", "long": 9.0942, "lat": 51.5588, "data1": "1", "id": "9", "data2": "1"}, {"name": "Declan and Rita Carroll", "long": 3.1333, "lat": 51.5881, "data1": "1", "id": "12", "data2": "1"}]}'
-    
+    #j = '{"markers": [{"name": "Rosaleen Mc Carthy", "long": 9.1066, "lat": 51.627, "data1": "1", "id": "2", "data2": "1"}, {"name": "Brian + Louise  Elphick", "long": 8.9751, "lat": 51.6123, "data1": "1", "id": "3", "data2": "2"}, {"name": "Graham and Sally Crowley", "long": 3.15, "lat": 51.548, "data1": "1", "id": "6", "data2": "3"}, {"name": "Eithne O Donovan", "long": 9.0942, "lat": 51.5588, "data1": "1", "id": "9", "data2": "1"}, {"name": "Declan and Rita Carroll", "long": 3.1333, "lat": 51.5881, "data1": "1", "id": "12", "data2": "1"}]}'
+    print form
     return render(request, 'mapping/index.html', {
-        'form': form,'json':j, 'qs': 'name=C&iscustomer=yesy&data=123'
+        'form': form, 'qs': ''
     })
     
+    
+    
+@csrf_exempt   
 def getjson(request):
     print request.GET
     #j = '{"markers": [{"name": "ssss", "long": 9.1066, "lat": 51.627, "data1": "1", "id": "2", "data2": "1"}, {"name": "cccccc", "long": 8.9751, "lat": 51.6123, "data1": "1", "id": "3", "data2": "2"}, {"name": "jjjjj", "long": 3.15, "lat": 51.548, "data1": "1", "id": "6", "data2": "3"}, {"name": "jj;lk;k;", "long": 9.0942, "lat": 51.5588, "data1": "1", "id": "9", "data2": "1"}, {"name": "iiiii", "long": 3.1333, "lat": 51.5881, "data1": "1", "id": "12", "data2": "1"}]}'
     
-    #data = Customer.objects.filter(gps_longitude__lte = -9.0).filter(voip_number__startswith='02')
-    data = Customer.objects.all()
+    #data = Customer.objects.filter(gps_longitude__lte = -9.0).filter(voip_number__startswith='0')
+    data = Customer.objects.filter(voip_number__startswith='0')
+    try:
+        name = request.GET['customer_name']
+        data = Customer.objects.filter(last_name__contains=name)
+    except:
+        data = Customer.objects.filter(voip_number__startswith='0')
+        pass
+    try:
+        billing_active = request.GET['billing_active']
+        data = data.filter(billing_active__exact=billing_active)
+    except:
+        
+        pass        
+    
+    #data = Customer.objects.all()
     markers = {}
     rows = []
     for d in data:
