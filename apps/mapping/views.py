@@ -37,8 +37,19 @@ def search(request):
                    
                 except:
                     billing_active = ''
-                    pass                    
-                qs = 'customer_name=%s&billing_active=%s'%(customer_name, billing_active)
+                    pass   
+                    
+                online = ''
+                try:
+                    online = request.POST['online']
+                   
+                except:
+                    online = ''
+                    pass   
+                    
+                                        
+                                     
+                qs = 'customer_name=%s&billing_active=%s&online=%s'%(customer_name, billing_active,online)
                 print qs
                 return render(request, 'mapping/index.html', {
                 'form': form, 'qs': qs
@@ -73,7 +84,12 @@ def getjson(request):
     except:
         
         pass        
-    
+    try:
+        online = request.GET['online']
+        data = data.filter(ip__contains='9')
+    except:
+        
+        pass     
     #data = Customer.objects.all()
     markers = {}
     rows = []
