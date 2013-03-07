@@ -7,5 +7,5 @@ urlpatterns = patterns('',
     url(r'^$', views.search, name='index'),
     url(r'^search$', views.search, name='search'),
     url(r'^json$', views.getjson, name='json'),
-   
+    url(r'^data$', views.getdata, name='data'),
 )

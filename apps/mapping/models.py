@@ -31,11 +31,11 @@ class Customer(models.Model):
 
 class Detail(models.Model):
     customer            = models.ForeignKey(Customer, db_index=True)
-    time_stamp		= models.DateTimeField(auto_now_add=True)
+    time_stamp		    = models.DateTimeField(auto_now_add=True)
     last_ping           = models.FloatField(null=True)
     avg_ping            = models.FloatField(null=True)
     sip_reg             = models.FloatField(null=True)
-    on_call		= models.BooleanField(null=False, default=0)
+    on_call		        = models.BooleanField(null=False, default=0)
     reg_ip              = models.IPAddressField(unique=False, null=True, default='')
-    signal_strength = models.FloatField(null=True)
+    signal_strength     = models.FloatField(null=True)
 

@@ -138,4 +138,5 @@ class CustomerForm(forms.Form):
     billing_active = forms.ChoiceField(choices=BILLING_CHOICES, required = False)
     customer_id = forms.CharField(max_length=5, required=False)
     sector_id = forms.ChoiceField(choices=SECTOR_ID_CHOICES, required = False)
+    will_come_back = forms.BooleanField(required=False)
     

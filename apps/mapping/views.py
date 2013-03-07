@@ -49,6 +49,15 @@ def search(request):
                     show_online = ''
                     pass   
 
+                will_come_back = 'off'
+                try:
+                   
+                    will_come_back = request.POST['will_come_back']
+                   
+                except:
+                    will_come_back = 'off'
+                    pass   
+                    
                 customer_id = '0'
                 try:
                    
@@ -67,7 +76,7 @@ def search(request):
                     sector_id = 'all'
                     pass
                                                         
-                qs = 'customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(customer_name, billing_active,show_online,customer_id, sector_id)
+                qs = 'will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
                 print qs
                 return render(request, 'mapping/index.html', {
                 'form': form, 'qs': qs
@@ -80,12 +89,8 @@ def search(request):
         'form': form, 'qs': ''
     })
     
+def filter_data(request):
     
-    
-@csrf_exempt   
-def getjson(request):
-    print request.GET
-
     #data = Customer.objects.filter(gps_longitude__lte = -9.0).filter(voip_number__startswith='0')
     data = Customer.objects.filter(voip_number__startswith='0')
     try:
@@ -117,7 +122,17 @@ def getjson(request):
             pass
     except:
         pass    
-         
+ 
+    try:
+        will_come_back = request.GET['will_come_back']
+        print "will_come_back %s "%will_come_back
+        if will_come_back == 'on':
+            data = data.filter(will_come_back__exact='1')
+        else: 
+            pass
+    except:
+        pass 
+        
     try:
         customer_id = request.GET['customer_id']
         print "customer_id %s "%customer_id
@@ -138,7 +153,15 @@ def getjson(request):
         
     except:
         pass  
-
+        
+    return data
+    
+    
+@csrf_exempt   
+def getjson(request):
+    print request.GET
+    
+    data = filter_data(request)
     #data = data.filter(sector_id__exact='AP-Skibb')
 
     #data = Customer.objects.all()
@@ -163,4 +186,38 @@ def getjson(request):
 
     return render(request, 'mapping/json.html', {
         "json":markers
+    })
+    
+    
+    
+    
+@csrf_exempt   
+def getdata(request):
+    print request.GET
+
+    data = filter_data(request)
+    #data = data.filter(sector_id__exact='AP-Skibb')
+
+    #data = Customer.objects.all()
+    markers = {}
+    rows = []
+    for d in data:
+        a = {}
+        a['name'] = "%s %s"%(   d.first_name, d.last_name)
+        a['long'] = d.gps_longitude
+        a['lat'] = d.gps_latitude
+        a['id'] = str(d.customer_id)
+        a['data1'] = str(1)
+        a['data2'] = str(2)
+        a['billing'] = str(d.billing_active)
+        a['ip'] = str(d.ip)
+        a['voip'] = str(d.voip_number)
+        rows.append(a)
+        
+
+    markers['markers'] = rows
+    markers = anyjson.serialize(markers)
+    print markers
+    return render(request, 'mapping/data.html', {
+        "data":rows
     })
