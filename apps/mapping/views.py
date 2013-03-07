@@ -31,26 +31,35 @@ def search(request):
                 except:
                     customer_name = ''
                     pass
-                billing_active = '0'
+                    
+                billing_active = 'all'
                 try:
                     billing_active = request.POST['billing_active']
                    
                 except:
-                    billing_active = ''
+                    billing_active = 'all'
                     pass   
                     
                 show_online = '0'
                 try:
-                    print 'aaaaaaaaaaaaaaaaaaa'
+                   
                     show_online = request.POST['show_online']
                    
                 except:
-                    online = ''
+                    show_online = ''
                     pass   
-                    
+
+                customer_id = '0'
+                try:
+                   
+                    customer_id = request.POST['customer_id']
+                   
+                except:
+                    customer_id = ''
+                    pass                      
                                         
                                      
-                qs = 'customer_name=%s&billing_active=%s&show_online=%s'%(customer_name, billing_active,show_online)
+                qs = 'customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s'%(customer_name, billing_active,show_online,customer_id)
                 print qs
                 return render(request, 'mapping/index.html', {
                 'form': form, 'qs': qs
@@ -58,8 +67,7 @@ def search(request):
     else:
         form = CustomerForm() # An unbound form
     
-    #j = '{"markers": [{"name": "Rosaleen Mc Carthy", "long": 9.1066, "lat": 51.627, "data1": "1", "id": "2", "data2": "1"}, {"name": "Brian + Louise  Elphick", "long": 8.9751, "lat": 51.6123, "data1": "1", "id": "3", "data2": "2"}, {"name": "Graham and Sally Crowley", "long": 3.15, "lat": 51.548, "data1": "1", "id": "6", "data2": "3"}, {"name": "Eithne O Donovan", "long": 9.0942, "lat": 51.5588, "data1": "1", "id": "9", "data2": "1"}, {"name": "Declan and Rita Carroll", "long": 3.1333, "lat": 51.5881, "data1": "1", "id": "12", "data2": "1"}]}'
-    print form
+
     return render(request, 'mapping/index.html', {
         'form': form, 'qs': ''
     })
@@ -69,12 +77,12 @@ def search(request):
 @csrf_exempt   
 def getjson(request):
     print request.GET
-    #j = '{"markers": [{"name": "ssss", "long": 9.1066, "lat": 51.627, "data1": "1", "id": "2", "data2": "1"}, {"name": "cccccc", "long": 8.9751, "lat": 51.6123, "data1": "1", "id": "3", "data2": "2"}, {"name": "jjjjj", "long": 3.15, "lat": 51.548, "data1": "1", "id": "6", "data2": "3"}, {"name": "jj;lk;k;", "long": 9.0942, "lat": 51.5588, "data1": "1", "id": "9", "data2": "1"}, {"name": "iiiii", "long": 3.1333, "lat": 51.5881, "data1": "1", "id": "12", "data2": "1"}]}'
-    
+
     #data = Customer.objects.filter(gps_longitude__lte = -9.0).filter(voip_number__startswith='0')
     data = Customer.objects.filter(voip_number__startswith='0')
     try:
         name = request.GET['customer_name']
+        print name
         data = Customer.objects.filter(last_name__contains=name)
     except:
         data = Customer.objects.all()
@@ -82,9 +90,10 @@ def getjson(request):
      
     try:
         billing_active = request.GET['billing_active']
+        print billing_active
         if billing_active == 'on':
             data = data.filter(billing_active__exact='1')
-        else:
+        elif billing_active == 'off':
             data = data.filter(billing_active__exact='0')
         
     except:
@@ -92,15 +101,25 @@ def getjson(request):
         pass        
     try:
         show_online = request.GET['show_online']
-        print 'online'
+        print show_online
         if show_online == 'on':
             data = data.filter(ip__contains='9')
+        elif show_online == 'off':
+            data = data.filter(ip__isnull=True)
+            pass
+    except:
+        pass    
+         
+    try:
+        customer_id = request.GET['customer_id']
+        print customer_id
+        if customer_id != '':
+            data = data.filter(customer_id__iexact=customer_id)
+            print data
         else:
             pass
-        
-        
     except:
-        pass     
+        pass 
     #data = Customer.objects.all()
     markers = {}
     rows = []
