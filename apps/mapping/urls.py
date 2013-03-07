@@ -4,7 +4,7 @@ from django.views.generic.simple import direct_to_template
 from mapping import views
 
 urlpatterns = patterns('',
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.search, name='index'),
     url(r'^search$', views.search, name='search'),
     url(r'^json$', views.getjson, name='json'),
    

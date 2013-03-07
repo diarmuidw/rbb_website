@@ -8,7 +8,7 @@ import anyjson
 @csrf_exempt
 def index(request):
     form = CustomerForm() # An unbound form
-    return render_to_response('mapping/index.html', {'form':form
+    return render_to_response('mapping/index.html', {'form':form,  'qs': ''
     })
     
     
