@@ -140,6 +140,8 @@ html, body {
 			//alert('after getjson')
 			//// loop all the markers
 			//alert(data.markers)
+            cnt = data.count;
+            $('#count').html('<p>' + cnt + '</p>');
             alldata = data.markers;
             //alert(alldata[1]['voip']);
             
@@ -354,7 +356,8 @@ html, body {
      <input type="submit" value="Submit" />
     </form>
 	<!-- Map Placeholder -->
-    <a href = '/mapping/data?time=123&{{qs|safe|escape}}'>Get Data</a>
+    <a href = '/mapping/data?time=123&{{qs|safe|escape}}' target='_blank' >Get Data</a>
+    <div id='count'></div>
 	<div id="myMap" ></div> 
 	
 {% endblock %}

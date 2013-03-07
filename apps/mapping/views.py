@@ -58,6 +58,15 @@ def search(request):
                     will_come_back = 'off'
                     pass   
                     
+                no_gps = 'off'
+                try:
+                   
+                    no_gps = request.POST['no_gps']
+                   
+                except:
+                    no_gps = 'off'
+                    pass 
+                                         
                 customer_id = '0'
                 try:
                    
@@ -76,7 +85,7 @@ def search(request):
                     sector_id = 'all'
                     pass
                                                         
-                qs = 'will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
+                qs = 'no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
                 print qs
                 return render(request, 'mapping/index.html', {
                 'form': form, 'qs': qs
@@ -132,7 +141,17 @@ def filter_data(request):
             pass
     except:
         pass 
-        
+
+    try:
+        no_gps = request.GET['no_gps']
+        print "no_gps %s "%no_gps
+        if no_gps == 'on':
+            data = data.filter(gps_latitude__exact='0')
+        else: 
+            pass
+    except:
+        pass 
+                
     try:
         customer_id = request.GET['customer_id']
         print "customer_id %s "%customer_id
@@ -180,8 +199,9 @@ def getjson(request):
         a['voip'] = str(d.voip_number)
         rows.append(a)
         
-
+    markers['count'] = len(rows)
     markers['markers'] = rows
+   
     markers = anyjson.serialize(markers)
 
     return render(request, 'mapping/json.html', {
