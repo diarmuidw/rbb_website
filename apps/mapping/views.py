@@ -58,8 +58,16 @@ def search(request):
                     customer_id = ''
                     pass                      
                                         
-                                     
-                qs = 'customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s'%(customer_name, billing_active,show_online,customer_id)
+                sector_id = 'all'
+                try:
+                   
+                    sector_id = request.POST['sector_id']
+                   
+                except:
+                    sector_id = 'all'
+                    pass
+                                                        
+                qs = 'customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(customer_name, billing_active,show_online,customer_id, sector_id)
                 print qs
                 return render(request, 'mapping/index.html', {
                 'form': form, 'qs': qs
@@ -82,7 +90,7 @@ def getjson(request):
     data = Customer.objects.filter(voip_number__startswith='0')
     try:
         name = request.GET['customer_name']
-        print name
+        print "name %s "%name
         data = Customer.objects.filter(last_name__contains=name)
     except:
         data = Customer.objects.all()
@@ -90,7 +98,7 @@ def getjson(request):
      
     try:
         billing_active = request.GET['billing_active']
-        print billing_active
+        print "billing_active %s "%billing_active
         if billing_active == 'on':
             data = data.filter(billing_active__exact='1')
         elif billing_active == 'off':
@@ -101,7 +109,7 @@ def getjson(request):
         pass        
     try:
         show_online = request.GET['show_online']
-        print show_online
+        print "show_online %s "%show_online
         if show_online == 'on':
             data = data.filter(ip__contains='9')
         elif show_online == 'off':
@@ -112,7 +120,7 @@ def getjson(request):
          
     try:
         customer_id = request.GET['customer_id']
-        print customer_id
+        print "customer_id %s "%customer_id
         if customer_id != '':
             data = data.filter(customer_id__iexact=customer_id)
             print data
@@ -120,6 +128,19 @@ def getjson(request):
             pass
     except:
         pass 
+    
+    try:
+        
+        sector_id = request.GET['sector_id']
+        print "Sector_id %s "%sector_id
+        if sector_id != 'all':
+            data = data.filter(sector_id__exact=sector_id)
+        
+    except:
+        pass  
+
+    #data = data.filter(sector_id__exact='AP-Skibb')
+
     #data = Customer.objects.all()
     markers = {}
     rows = []
