@@ -221,6 +221,17 @@
 			//map.setCenter(defaultLatlng);
 			//map.setZoom(defaultZoom);
 		}); 	
+        
+            google.maps.event.addListener(marker, 'mouseover', function() {
+       showMarker(marker.id, marker.title);  
+    });
+      
+        
+        
+        
+        
+        
+        
 		}//end of data1==0
 	}	
 	
