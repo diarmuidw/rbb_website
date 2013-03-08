@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from mapping.forms import CustomerForm
-from mapping.models import Customer
+from mapping.models import Customer, Detail
 
 import anyjson
 
@@ -73,7 +73,15 @@ def search(request):
             except:
                 no_gps = 'off'
                 pass 
-                                     
+                
+            phone_active = 'off'
+            try:
+               
+                phone_active = request.POST['phone_active']
+               
+            except:
+                phone_active = 'off'
+                pass                                     
             customer_id = '0'
             try:
                
@@ -92,7 +100,7 @@ def search(request):
                 sector_id = 'all'
                 pass
                                                     
-            qs = 'no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
+            qs = 'phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
             logger.debug( qs)
             return render(request, 'mapping/index.html', {
             'form': form, 'qs': qs
@@ -180,8 +188,29 @@ def filter_data(request):
     except:
         pass  
         
-    return data
     
+
+    try:
+        
+        phone_active = request.GET['phone_active']
+        logger.debug( "phone_active %s "%phone_active)
+        if sector_id != 'off':
+            from datetime import datetime, timedelta
+
+            now = datetime.now()
+            an_hour_ago = now - timedelta(hours=int(phone_active))
+            #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
+            #print details
+            try:
+                data = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
+                print data
+            except Exception, ex:
+                print ex
+        
+    except:
+        pass  
+        
+    return data    
     
 @csrf_exempt   
 def getjson(request):
@@ -247,5 +276,47 @@ def getdata(request):
     markers = anyjson.serialize(markers)
     #print markers
     return render(request, 'mapping/data.html', {
+        "data":rows
+    })
+    
+    
+@csrf_exempt   
+def lasthour(request):
+    logger.debug('lasthour')
+    logger.debug( request.GET)
+    from datetime import datetime, timedelta
+
+    now = datetime.now()
+
+ 
+    an_hour_ago = now - timedelta(hours=100)
+    #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
+    #print details
+    try:
+        data = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
+        print data
+    except Exception, ex:
+        print ex
+
+    markers = {}
+    rows = []
+    for d in data:
+        a = {}
+        a['name'] = "%s %s"%(   d.first_name, d.last_name)
+        a['long'] = d.gps_longitude
+        a['lat'] = d.gps_latitude
+        a['id'] = str(d.customer_id)
+        a['data1'] = str(1)
+        a['data2'] = str(2)
+        a['billing'] = str(d.billing_active)
+        a['ip'] = str(d.ip)
+        a['voip'] = str(d.voip_number)
+        rows.append(a)
+        
+
+    markers['markers'] = rows
+    markers = anyjson.serialize(markers)
+    #print markers
+    return render(request, 'mapping/index.html', {
         "data":rows
     })

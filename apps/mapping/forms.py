@@ -13,6 +13,18 @@ BILLING_CHOICES = (
     ('off', 'Not Billing'),
 )
    
+PHONE_CHOICES = (
+    ('off', 'Off'),
+    ('1', '1 Hour'),
+    ('2', '2 Hour'),
+    ('6', '6 Hours'),
+    ('12', '12 Hours'),
+    ('24', '1 Day'),
+    ('48', '2 Days'),
+    ('96', '4 Days'),
+    ('168', '1 Week'),
+)
+   
 SECTOR_ID_CHOICES = (
     ('all', 'All'),
     ('None','None'),
@@ -130,7 +142,6 @@ SECTOR_ID_CHOICES = (
 )
 
 
-
 class CustomerForm(forms.Form):
     customer_name = forms.CharField(max_length=100, required=False)
     #show_online = forms.BooleanField(required=False)
@@ -140,4 +151,5 @@ class CustomerForm(forms.Form):
     sector_id = forms.ChoiceField(choices=SECTOR_ID_CHOICES, required = False)
     will_come_back = forms.BooleanField(required=False)
     no_gps = forms.BooleanField(required=False)
+    phone_active = forms.ChoiceField(choices=PHONE_CHOICES, required = False)
     

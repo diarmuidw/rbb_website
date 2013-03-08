@@ -8,4 +8,5 @@ urlpatterns = patterns('',
     url(r'^search$', views.search, name='search'),
     url(r'^json$', views.getjson, name='json'),
     url(r'^data$', views.getdata, name='data'),
+    url(r'^lasthour$', views.lasthour, name='lasthour'),
 )
