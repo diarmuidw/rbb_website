@@ -202,8 +202,8 @@ def filter_data(request):
             #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
             #print details
             try:
-                data = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct().order_by(customer_id)
-                print data
+                data = data.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
+                #print data
             except Exception, ex:
                 print ex
         
