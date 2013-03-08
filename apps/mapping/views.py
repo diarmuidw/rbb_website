@@ -172,7 +172,7 @@ def filter_data(request):
         logger.debug( "customer_id %s "%customer_id)
         if customer_id != '':
             data = data.filter(customer_id__iexact=customer_id)
-            print data
+            
         else:
             pass
     except:
@@ -202,7 +202,7 @@ def filter_data(request):
             #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
             #print details
             try:
-                data = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
+                data = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct().order_by(customer_id)
                 print data
             except Exception, ex:
                 print ex
@@ -271,7 +271,7 @@ def getdata(request):
         a['voip'] = str(d.voip_number)
         rows.append(a)
         
-
+    #rows = sorted(rows)
     markers['markers'] = rows
     markers = anyjson.serialize(markers)
     #print markers
@@ -312,7 +312,8 @@ def lasthour(request):
         a['ip'] = str(d.ip)
         a['voip'] = str(d.voip_number)
         rows.append(a)
-        
+    
+    
 
     markers['markers'] = rows
     markers = anyjson.serialize(markers)
