@@ -18,10 +18,16 @@ def index(request):
     return render_to_response('mapping/index.html', {'form':form,  'qs': ''
     })
     
-    
+@csrf_exempt
+def out(request):
+    form = CustomerForm() # An unbound form
+    return render_to_response('mapping/out.html', {'form':form,  'qs': ''
+    })
+        
     
 @csrf_exempt
 def search(request):
+    
     logger.debug( "search")
     if request.method == 'POST': # If the form has been submitted...
         form = CustomerForm(request.POST) # A form bound to the POST data
@@ -81,26 +87,39 @@ def search(request):
                
             except:
                 phone_active = 'off'
-                pass                                     
-            customer_id = '0'
+                pass      
+
+            phone_out = 'off'
             try:
                
-                customer_id = request.POST['customer_id']
+                phone_out = request.POST['phone_out']
                
+            except:
+                phone_out = 'off'
+                pass  
+                                
+            has_phone = 'all'
+            try:
+                has_phone = request.POST['has_phone']
+            except:
+                has_phone = 'all'
+                pass  
+                                                              
+            customer_id = '0'
+            try:
+                customer_id = request.POST['customer_id']
             except:
                 customer_id = ''
                 pass                      
                                     
             sector_id = 'all'
             try:
-               
                 sector_id = request.POST['sector_id']
-               
             except:
                 sector_id = 'all'
                 pass
                                                     
-            qs = 'phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
+            qs = 'phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
             logger.debug( qs)
             return render(request, 'mapping/index.html', {
             'form': form, 'qs': qs
@@ -115,12 +134,14 @@ def search(request):
     
 def filter_data(request):
     
+    
     #data = Customer.objects.filter(gps_longitude__lte = -9.0).filter(voip_number__startswith='0')
-    data = Customer.objects.filter(voip_number__startswith='0')
+    data = Customer.objects.all()
     try:
         name = request.GET['customer_name']
         logger.debug( "name %s "%name)
-        data = Customer.objects.filter(last_name__contains=name)
+        if name!='':
+            data = Customer.objects.filter(last_name__contains=name)
     except:
         data = Customer.objects.all()
         pass
@@ -132,9 +153,7 @@ def filter_data(request):
             data = data.filter(billing_active__exact='1')
         elif billing_active == 'off':
             data = data.filter(billing_active__exact='0')
-        
     except:
-        
         pass        
     try:
         show_online = request.GET['show_online']
@@ -179,16 +198,22 @@ def filter_data(request):
         pass 
     
     try:
-        
         sector_id = request.GET['sector_id']
         logger.debug( "Sector_id %s "%sector_id)
         if sector_id != 'all':
             data = data.filter(sector_id__exact=sector_id)
-        
     except:
         pass  
         
-    
+    try:
+        has_phone = request.GET['has_phone']
+        logger.debug( "has_phone %s "%has_phone)
+        if has_phone == 'on':
+            data = data.filter(voip_number__startswith='0')
+        elif has_phone == "off":
+            data = data.filter(voip_number__isnull=True)
+    except:
+        pass    
 
     try:
         
@@ -206,14 +231,42 @@ def filter_data(request):
                 #print data
             except Exception, ex:
                 print ex
-        
     except:
         pass  
-        
+
+    #now a tricky one
+    #find phones that have a voip number but exclude those that were active in last hour
+    try:
+        phone_out = request.GET['phone_out']
+        logger.debug( "phone_out %s "%phone_out)
+        if phone_out != '':
+            #print 'aaaaaaaaaaaaaaaaa'
+            from datetime import datetime, timedelta
+            now = datetime.now()
+            an_hour_ago = now - timedelta(hours=int(phone_out))
+            #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
+            #print details
+            try:
+                activedata = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
+                #print activedata
+            except Exception, ex:
+                print ex        
+            #print 'bbbbbbbbbbbbbbb'
+            activephones = list(activedata.values_list('customer_id', flat=True))
+            #print len(activephones)
+            #data.exclude(customer_id__in=[o for o in activephones])
+            data = data.filter(voip_number__startswith='0').exclude(customer_id__in=[o for o in activephones])
+            #print 'after exclude'
+    except Exception, ex:
+        print ex
+        pass  
+    l =  list(data.values_list('customer_id', flat=True))
+    print len(l)
     return data    
     
 @csrf_exempt   
 def getjson(request):
+    
     logger.debug('getjson')
     logger.debug( request.GET)
     
@@ -250,6 +303,7 @@ def getjson(request):
     
 @csrf_exempt   
 def getdata(request):
+    
     logger.debug( request.GET)
 
     data = filter_data(request)
@@ -281,26 +335,38 @@ def getdata(request):
     
     
 @csrf_exempt   
-def lasthour(request):
-    logger.debug('lasthour')
+def outlasthour(request):
+    logger.debug('outlasthour')
     logger.debug( request.GET)
     from datetime import datetime, timedelta
 
     now = datetime.now()
 
  
-    an_hour_ago = now - timedelta(hours=100)
+    an_hour_ago = now - timedelta(hours=1)
     #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
     #print details
+    #this gets all phones active in last hour
     try:
         data = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
-        print data
+        #print data
+    except Exception, ex:
+        print ex        
+    activephones = list(data.values_list('customer_id', flat=True))
+    
+    #print activephones
+    print len(activephones)
+
+    try:
+        outdata = Customer.objects.filter(voip_number__startswith='0').exclude(customer_id__in=[o for o in activephones])
+        print outdata
     except Exception, ex:
         print ex
-
+    print len(outdata)
+    
     markers = {}
     rows = []
-    for d in data:
+    for d in outdata:
         a = {}
         a['name'] = "%s %s"%(   d.first_name, d.last_name)
         a['long'] = d.gps_longitude
@@ -312,12 +378,14 @@ def lasthour(request):
         a['ip'] = str(d.ip)
         a['voip'] = str(d.voip_number)
         rows.append(a)
+        #print a['id'], a['long'], a['lat']
     
-    
-
+    markers['count'] = len(rows)
     markers['markers'] = rows
     markers = anyjson.serialize(markers)
+    
     #print markers
-    return render(request, 'mapping/index.html', {
-        "data":rows
+    #print rows
+    return render(request, 'mapping/json.html', {
+        "json":markers
     })
