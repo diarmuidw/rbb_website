@@ -10,5 +10,5 @@ urlpatterns = patterns('',
     url(r'^data$', views.getdata, name='data'),
     url(r'^outlasthour$', views.outlasthour, name='outlasthour'),
     url(r'^out$', views.out, name='out'),
-    
+    url(r'^viewmap$', views.viewmap, name='viewmap'),
 )

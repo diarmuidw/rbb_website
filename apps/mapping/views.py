@@ -298,7 +298,44 @@ def getjson(request):
         "json":markers
     })
     
+@csrf_exempt   
+def viewmap(request):
     
+    logger.debug('viewmap')
+    logger.debug( request.GET)
+    print dir(request.GET)
+    qs = ''
+    for k in request.GET.keys():
+        print k, request.GET[k]
+        qs = "%s&%s=%s"%(qs,k,request.GET[k])
+    print qs
+    data = filter_data(request)
+    #data = data.filter(sector_id__exact='AP-Skibb')
+
+    #data = Customer.objects.all()
+    markers = {}
+    rows = []
+    for d in data:
+        a = {}
+        a['name'] = "%s %s"%(   d.first_name, d.last_name)
+        a['long'] = d.gps_longitude
+        a['lat'] = d.gps_latitude
+        a['id'] = str(d.customer_id)
+        a['data1'] = str(1)
+        a['data2'] = str(2)
+        a['billing'] = str(d.billing_active)
+        a['ip'] = str(d.ip)
+        a['voip'] = str(d.voip_number)
+        rows.append(a)
+        
+    markers['count'] = len(rows)
+    markers['markers'] = rows
+   
+    markers = anyjson.serialize(markers)
+
+    return render(request, 'mapping/map.html', {
+        "json":markers, 'qs': qs
+    })
     
     
 @csrf_exempt   

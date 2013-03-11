@@ -1,19 +1,6 @@
-{% extends "site_base.html" %}
+<html>
 
-{% load i18n %}
-{% load ifsetting_tag %}
-
-{% block head_title %}{% trans "Mapping" %}{% endblock %}
-
-{% block javascript %}
-
-
-
-{% endblock %}
-
-
-
-{% block body %}
+<body>
     
     
 <style type="text/css"> 
@@ -354,30 +341,12 @@ html, body {
 	}
  
 </script> 
- 
+ <META HTTP-EQUIV="refresh" CONTENT="15">
 </head> 
  
 <body onload="loadMap()"> 
-	<!-- Title -->
-    <table>
-    <tr>
-    <td>
-	<form action="/mapping/search" method="post">{% csrf_token %}
-        {{ form.as_p }}
-     <input type="submit" value="Submit" />
-    </form>
-        <a href = '/mapping/data?time=123&{{qs|safe|escape}}' target='_blank' >Get Data</a>
-        <a href = '/mapping/viewmap?time=123&{{qs|safe|escape}}' target='_blank' >View Map</a>
     <div id='count'></div>
-    </td>
-    <td>
-	<!-- Map Placeholder -->
-
 	<div id="myMap" ></div> 
-    </td>
-    </tr>
-    </table>
-	
 
-    
-{% endblock %}
+</body>
+</html>
