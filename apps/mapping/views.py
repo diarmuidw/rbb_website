@@ -235,7 +235,7 @@ def filter_data(request):
         pass  
 
     #now a tricky one
-    #find phones that have a voip number but exclude those that were active in last hour
+    #find phones that have a voip number but exclude those that were active in phone_out
     try:
         phone_out = request.GET['phone_out']
         logger.debug( "phone_out %s "%phone_out)
@@ -250,13 +250,40 @@ def filter_data(request):
                 activedata = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
                 #print activedata
             except Exception, ex:
-                print ex        
-            #print 'bbbbbbbbbbbbbbb'
+                print ex       
+                
+            #now find dead phones
+            a_week_ago=  now - timedelta(hours=24*7)
+            #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
+            #print details
+            try:
+                deaddata = Customer.objects.filter(detail__time_stamp__range=(a_week_ago, now)).distinct()
+                print deaddata
+            except Exception, ex:
+                print ex    
+                
+                
+            print 'bbbbbbbbbbbbbbb'
             activephones = list(activedata.values_list('customer_id', flat=True))
-            #print len(activephones)
+            weekphones = list(deaddata.values_list('customer_id', flat=True))
+            print len(activephones)
+            print 'aaaaaaaaaaaaaaa'
+            print len(weekphones)
+            
+            
+            for x in activephones:
+                try:    
+                    weekphones.remove(x)
+                except Exception, ex:
+                    pass
+            
+            
+            print weekphones
             #data.exclude(customer_id__in=[o for o in activephones])
-            data = data.filter(voip_number__startswith='0').exclude(customer_id__in=[o for o in activephones])
-            #print 'after exclude'
+            #data = data.filter(voip_number__startswith='0').exclude(customer_id__in=[o for o in activephones])
+            data = data.filter(customer_id__in=[o for o in weekphones])
+            #data = data.exclude(customer_id__in=[o for o in deadphones])
+            print 'after exclude'
     except Exception, ex:
         print ex
         pass  
