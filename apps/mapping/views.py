@@ -119,17 +119,17 @@ def search(request):
                 sector_id = 'all'
                 pass
             
-            phone_out_range = 'off'
+            last_check_in = 'off'
             try:
                
-                phone_out_range = request.POST['phone_out_range']
+                last_check_in = request.POST['last_check_in']
                
             except:
-                phone_out_range = 'off'
+                last_check_in = 'off'
                 pass 
                         
             
-            qs = 'phone_out_range=%s&phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(phone_out_range,phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
+            qs = 'last_check_in=%s&phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(last_check_in,phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
             logger.debug( qs)
             return render(request, 'mapping/index.html', {
             'form': form, 'qs': qs
@@ -313,34 +313,39 @@ def filter_data(request):
     
     #now do phone range
     try:
-        phone_out_range = request.GET['phone_out_range']
-        logger.debug( "phone_out_range %s "%phone_out_range)
-        if phone_out_range != 'off':
+        last_check_in = request.GET['last_check_in']
+        logger.debug( "last_check_in %s "%last_check_in)
+        if last_check_in != 'off':
             print 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
             from datetime import datetime, timedelta
             now = datetime.now()
             start_range = 0
             end_range = 0
-            
-            if phone_out_range == '1':
+            if last_check_in == '0.25':
+                start_range = now - timedelta(hours=0.25)
+                end_range = now
+            elif last_check_in == '0.5':
+                start_range = now - timedelta(hours=0.5)
+                end_range = now
+            elif last_check_in == '1':
                 start_range = now - timedelta(hours=int(1))
                 end_range = now
-            elif phone_out_range == '2':
+            elif last_check_in == '2':
                 start_range = now - timedelta(hours=int(2))
                 end_range = now - timedelta(hours=int(1))
-            elif phone_out_range == '6':
+            elif last_check_in == '6':
                 start_range = now - timedelta(hours=int(6))
                 end_range = now - timedelta(hours=int(2))
-            elif phone_out_range == '12':
+            elif last_check_in == '12':
                 start_range = now - timedelta(hours=int(12))
                 end_range = now - timedelta(hours=int(6))
-            elif phone_out_range == '24':
+            elif last_check_in == '24':
                 start_range = now - timedelta(hours=int(24))
                 end_range = now - timedelta(hours=int(12))
-            elif phone_out_range == '48':
+            elif last_check_in == '48':
                 start_range = now - timedelta(hours=int(48))
                 end_range = now - timedelta(hours=int(24))
-            elif phone_out_range == '96':
+            elif last_check_in == '96':
                 start_range = now - timedelta(hours=int(96))
                 end_range = now - timedelta(hours=int(48))
             print 'start_range %s'%start_range

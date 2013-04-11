@@ -34,14 +34,16 @@ PHONE_CHOICES = (
 
 PHONE_RANGE_CHOICES = (
     ('off', 'Off'),
-    ('1', '1 Hour'),
-    ('2', '2 Hour'),
-    ('6', '6 Hours'),
-    ('12', '12 Hours'),
-    ('24', '1 Day'),
-    ('48', '2 Days'),
-    ('96', '4 Days'),
-    ('168', '1 Week'),
+    ('0.25', 'within last 1/4 Hour'),
+    ('0.5', 'within last 1/2 Hour'),
+    ('1', 'within last 1 Hour'),
+    ('2', 'between 1 and 2 Hours'),
+    ('6', 'between 2 and 6 Hours'),
+    ('12', 'between 6 and 12 Hours'),
+    ('24', 'between 12 hours and 1 Day'),
+    ('48', 'between 1 and 2 Days'),
+    ('96', 'between 2 and 4 Days'),
+    ('168', 'between 4 days and 1 Week'),
 )
 SECTOR_ID_CHOICES = (
     ('all', 'All'),
@@ -171,5 +173,5 @@ class CustomerForm(forms.Form):
     no_gps = forms.BooleanField(required=False)
     phone_active = forms.ChoiceField(choices=PHONE_CHOICES, required = False)
     phone_out = forms.ChoiceField(choices=PHONE_CHOICES, required = False)
-    phone_out_range = forms.ChoiceField(choices=PHONE_RANGE_CHOICES, required = False)
+    last_check_in = forms.ChoiceField(choices=PHONE_RANGE_CHOICES, required = False)
     
