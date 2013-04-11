@@ -118,18 +118,8 @@ def search(request):
             except:
                 sector_id = 'all'
                 pass
-            
-            phone_out_range = 'off'
-            try:
-               
-                phone_out_range = request.POST['phone_out_range']
-               
-            except:
-                phone_out_range = 'off'
-                pass 
-                        
-            
-            qs = 'phone_out_range=%s&phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(phone_out_range,phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
+                                                    
+            qs = 'phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
             logger.debug( qs)
             return render(request, 'mapping/index.html', {
             'form': form, 'qs': qs
@@ -144,7 +134,7 @@ def search(request):
     
 def filter_data(request):
     
-    print 'filter_data'
+    
     #data = Customer.objects.filter(gps_longitude__lte = -9.0).filter(voip_number__startswith='0')
     data = Customer.objects.all()
     try:
@@ -250,17 +240,16 @@ def filter_data(request):
         phone_out = request.GET['phone_out']
         logger.debug( "phone_out %s "%phone_out)
         if phone_out != 'off':
-            print 'doing phone out'
+            #print 'aaaaaaaaaaaaaaaaa'
             from datetime import datetime, timedelta
             now = datetime.now()
-            print 'doing active phones'
             time_period = now - timedelta(hours=int(phone_out))
             try:
                 activedata = Customer.objects.filter(detail__time_stamp__range=(time_period, now)).distinct()
                 #print activedata
             except Exception, ex:
                 print ex       
-            print 'doing week phones'
+                
             #now find phones active in the past week
             a_week_ago=  now - timedelta(hours=24*7)
             try:
@@ -277,19 +266,15 @@ def filter_data(request):
 ##            except Exception, ex:
 ##                print ex   
                 
-            print 'convert to list'
-            try:
-                activephones = list(activedata.values_list('customer_id', flat=True))
-            except Exception, ex:
-                print ex
-            print 'doing weekphones'
+                
+            activephones = list(activedata.values_list('customer_id', flat=True))
             weekphones = list(active_in_past_week.values_list('customer_id', flat=True))
             #ddd = list(dd.values_list('customer_id', flat=True))
             
             print len(activephones)
             print len(weekphones)
             #print len(ddd)
-            print 'after active phones'
+            
             
             for x in activephones:
                 try:    
@@ -310,61 +295,8 @@ def filter_data(request):
     except Exception, ex:
         print ex
         pass  
-    
-    #now do phone range
-    try:
-        phone_out_range = request.GET['phone_out_range']
-        logger.debug( "phone_out_range %s "%phone_out_range)
-        if phone_out_range != 'off':
-            print 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-            from datetime import datetime, timedelta
-            now = datetime.now()
-            start_range = 0
-            end_range = 0
-            
-            if phone_out_range == '1':
-                start_range = now - timedelta(hours=int(1))
-                end_range = now
-            elif phone_out_range == '2':
-                start_range = now - timedelta(hours=int(2))
-                end_range = now - timedelta(hours=int(1))
-            elif phone_out_range == '6':
-                start_range = now - timedelta(hours=int(6))
-                end_range = now - timedelta(hours=int(2))
-            elif phone_out_range == '12':
-                start_range = now - timedelta(hours=int(12))
-                end_range = now - timedelta(hours=int(6))
-            elif phone_out_range == '24':
-                start_range = now - timedelta(hours=int(24))
-                end_range = now - timedelta(hours=int(12))
-            elif phone_out_range == '48':
-                start_range = now - timedelta(hours=int(48))
-                end_range = now - timedelta(hours=int(24))
-            elif phone_out_range == '96':
-                start_range = now - timedelta(hours=int(96))
-                end_range = now - timedelta(hours=int(48))
-            print 'start_range %s'%start_range
-            print 'end_range  %s'%end_range
-            
-            try:
-                data = Customer.objects.filter(latest__time_stamp__range=(start_range, end_range))
-                #print data
-            except Exception, ex:
-                print ex        
-            activephones = list(data.values_list('customer_id', flat=True))
-            print len(activephones)      
-            print 'bbbbbbbbbbbbbbbbbbbbbbbbbbbb'
-            
-    except Exception, ex:
-        print ex
-        pass  
-    
-    
-    
-    
     l =  list(data.values_list('customer_id', flat=True))
     print len(l)
-    #print l
     return data    
     
 @csrf_exempt   
@@ -476,7 +408,6 @@ def getdata(request):
     
 @csrf_exempt   
 def outlasthour(request):
-    
     logger.debug('outlasthour')
     logger.debug( request.GET)
     from datetime import datetime, timedelta
@@ -532,7 +463,7 @@ def outlasthour(request):
     })
     
     
-   
+@csrf_exempt   
 def phoneoutrun(request):
     logger.debug('phoneoutrun')
     logger.debug( request.GET)
@@ -540,33 +471,49 @@ def phoneoutrun(request):
 
     now = datetime.now()
 
-    an_hour_ago = now - timedelta(hours=16)
+    an_hour_ago = now - timedelta(hours=1)
     #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
     #print details
     #this gets all phones active in last hour
     try:
-        data = Customer.objects.filter(latest__time_stamp__range=(an_hour_ago, now))
+        data = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
         #print data
     except Exception, ex:
         print ex        
     activephones = list(data.values_list('customer_id', flat=True))
-    print len(activephones)
-##    #print activephones
-##    print len(activephones)
-##    print 'phoneoutrun'
-##    try:
-##        allphones = Customer.objects.filter(voip_number__startswith='0')#.exclude(customer_id__in=[o for o in activephones])
-##        #print outdata
-##    except Exception, ex:
-##        print ex
-##    print 
-##    print 'len of allphones = %s'%len(allphones)    
-##    
-##    for p in allphones:
-##        #now do calcs for each phone
-##        pass
-##        
-##    return allphones
-
     
-   
+    #print activephones
+    print len(activephones)
+    print 'phoneoutrun'
+    try:
+        outdata = Customer.objects.filter(voip_number__startswith='0')#.exclude(customer_id__in=[o for o in activephones])
+        #print outdata
+    except Exception, ex:
+        print ex
+    print 
+    print 'len of outdata = %s'%len(outdata)    
+ 
+    markers = {}
+    rows = []
+    for d in outdata:
+        a = {}
+        a['name'] = "%s %s"%(   d.first_name, d.last_name)
+        a['long'] = d.gps_longitude
+        a['lat'] = d.gps_latitude
+        a['id'] = str(d.customer_id)
+        a['data1'] = str(1)
+        a['data2'] = str(2)
+        a['billing'] = str(d.billing_active)
+        a['ip'] = str(d.ip)
+        a['voip'] = str(d.voip_number)
+        rows.append(a)
+        
+    markers['count'] = len(rows)
+    markers['markers'] = rows
+    print markers['count']
+    markers = anyjson.serialize(markers)
+
+    return render(request, 'mapping/map.html', {
+        "json":markers, 'qs': 'time=1365068149092&phone_out=off&has_phone=all&phone_active=off&no_gps=off&will_come_back=off&customer_name=&billing_active=off&show_online=on&customer_id=&sector_id=all'
+    })
+    

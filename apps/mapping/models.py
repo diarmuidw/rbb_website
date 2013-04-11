@@ -31,7 +31,7 @@ class Customer(models.Model):
 
 class Detail(models.Model):
     customer            = models.ForeignKey(Customer, db_index=True)
-    time_stamp		    = models.DateTimeField(auto_now_add=True)
+    time_stamp		    = models.DateTimeField(auto_now_add=True, db_index=True)
     last_ping           = models.FloatField(null=True)
     avg_ping            = models.FloatField(null=True)
     sip_reg             = models.FloatField(null=True)
@@ -39,3 +39,23 @@ class Detail(models.Model):
     reg_ip              = models.IPAddressField(unique=False, null=True, default='')
     signal_strength     = models.FloatField(null=True)
 
+class phoneout(models.Model):
+    customer            = models.ForeignKey(Customer, db_index=True)
+    time_stamp		    = models.DateTimeField(auto_now_add=True)
+    phone_on            = models.BooleanField(null=False, default=0) 
+    phone_1hour         = models.BooleanField(null=False, default=0) 
+    phone_2hour         = models.BooleanField(null=False, default=0)
+    phone_6hour         = models.BooleanField(null=False, default=0)  
+    phone_12hour        = models.BooleanField(null=False, default=0)  
+  
+class latest(models.Model):
+    customer            = models.ForeignKey(Customer, db_index=True)
+    time_stamp		    = models.DateTimeField(auto_now_add=True)
+    last_ping           = models.FloatField(null=True)
+    avg_ping            = models.FloatField(null=True)
+    sip_reg             = models.FloatField(null=True)
+    on_call		        = models.BooleanField(null=False, default=0)
+    reg_ip              = models.IPAddressField(unique=False, null=True, default='')
+    signal_strength     = models.FloatField(null= True)
+    
+    
