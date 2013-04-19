@@ -222,11 +222,11 @@ html, body {
 		//console.log(markerData['lat'] + ', ' +  markerData['long'])
 		var myLatlng = new google.maps.LatLng(markerData['lat'], markerData['long']);
 		img = imagegreen;
-        //alert("loadSector");
-
-        //drawCellWithTA(map, markerData['lat'], markerData['long'], markerData['direction'], markerData['angle'], markerData['distance']);
+        //alert(markerData['color']);
+        //alert("after color");
+        //drawCellWithTA(map, markerData['lat'], markerData['long'], markerData['direction'], markerData['angle'], markerData['distance'], markerData['color']);
         //drawCellWithTA(map, 52.707174, -5.813648, 90.0, 180.0, 20.0);
-        drawCellWithDirection(map,  parseFloat(markerData['lat']), parseFloat(markerData['long']), parseInt(markerData['direction']), parseInt(markerData['angle']),parseInt( markerData['distance']));
+        drawCellWithDirection(map,  parseFloat(markerData['lat']), parseFloat(markerData['long']), parseInt(markerData['direction']), parseInt(markerData['angle']),parseInt( markerData['distance']),  markerData['color']);
         //drawCellWithTA(map, markerData['lat'], markerData['long'], markerData['direction'], markerData['angle'], markerData['distance']);
        
     //drawCellWithTA(map, 52.707174, -8.813648, 90.0, 180.0, 50.0);
