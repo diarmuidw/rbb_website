@@ -46,6 +46,19 @@ function drawCellWithTA(map, lat, lon, st, end, distance)
 
 }
 
+function drawCellWithDirection(map, lat, lon, direction, sweepangle, distance)
+{
+    //alert(lon);
+    //alert(lat);
+    //alert(st);
+    //alert(end);
+    //alert(distance);
+    var cell = new ttCell_new( lat, lon, direction, sweepangle, distance);
+    cell.log();
+    cell.drawWithTA(map, 1);
+
+}
+
 function drawCellWithColor(map, lac, cid, color)
 {
 	var l = "L" + lac;
@@ -164,16 +177,16 @@ function ttCell(lac, cid, lat, lon, startAngle, stopAngle, radius)
 
 
         
-  bermudaTriangle = new google.maps.Polygon({
-    paths: points,
-    strokeColor: "#FF0000",
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "#FF0000",
-    fillOpacity: 0.35
-  })     
-bermudaTriangle.setMap(map);   
-        
+        bermudaTriangle = new google.maps.Polygon({
+            paths: points,
+            strokeColor: "#FF0000",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#FF0000",
+            fillOpacity: 0.35
+          })     
+        bermudaTriangle.setMap(map);   
+                
 		//alert('after poly setmap');
 
 	}
@@ -184,7 +197,7 @@ bermudaTriangle.setMap(map);
 	
 	this.drawWithTA = function (map, ta) {
 	    this._draw(map, "#ff0000", ta);
-        ////alert('drawwith');
+        
 	}
 	
 	this.infoWindow = function (map, msg) {
@@ -192,5 +205,13 @@ bermudaTriangle.setMap(map);
 	}
 }
 
+function ttCell_new(lat, lon, direction, sweepangle, radius)
+{
+    var st = direction - sweepangle/2;
+    var end = direction + sweepangle/2;
+    
+    var cell = new ttCell(1, 1, lat, lon, st, end, radius);
+    return cell
+}
 
 var cells = {};
