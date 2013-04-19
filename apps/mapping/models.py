@@ -67,4 +67,6 @@ class Sector(models.Model):
     angle               = models.FloatField(null=True)
     distance            = models.FloatField(null=True)
     color               = models.CharField(max_length=6, null=True)
+    def __unicode__(self):
+        return (self.name)
 
