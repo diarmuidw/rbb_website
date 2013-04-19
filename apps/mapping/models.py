@@ -58,4 +58,13 @@ class latest(models.Model):
     reg_ip              = models.IPAddressField(unique=False, null=True, default='')
     signal_strength     = models.FloatField(null= True)
     
-    
+class Sector(models.Model):
+    name = models.CharField(max_length=30, null=False)
+    ip_address = models.IPAddressField(unique=False, null=True, default='')
+    gps_latitude        = models.FloatField(null=True)
+    gps_longitude       = models.CharField(max_length=50, null=True)
+    direction           = models.FloatField(null=True)
+    angle               = models.FloatField(null=True)
+    distance            = models.FloatField(null=True)
+    color               = models.CharField(max_length=6, null=True)
+

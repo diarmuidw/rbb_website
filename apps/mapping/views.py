@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from mapping.forms import CustomerForm
-from mapping.models import Customer, Detail
+from mapping.models import Customer, Detail, Sector
 
 import anyjson
 
@@ -405,6 +405,38 @@ def getjson(request):
     return render(request, 'mapping/json.html', {
         "json":markers
     })
+
+    
+@csrf_exempt   
+def getsectorjson(request):
+    
+    logger.debug('getjson')
+    logger.debug( request.GET)
+    
+    data = Sector.objects.all()
+    markers = {}
+    rows = []
+    for d in data:
+        a = {}
+        a['name'] = "%s"%(   d.name)
+        a['long'] = d.gps_longitude
+        a['lat'] = d.gps_latitude
+        a['direction'] = d.direction
+        a['angle'] = d.angle
+        a['distance'] = d.distance
+        a['color'] = d.color
+
+        rows.append(a)
+        
+    markers['count'] = len(rows)
+    markers['markers'] = rows
+   
+    markers = anyjson.serialize(markers)
+    print markers
+    return render(request, 'mapping/json.html', {
+        "json":markers
+    })
+    
     
 @csrf_exempt   
 def viewmap(request):

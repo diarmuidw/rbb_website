@@ -42,6 +42,7 @@ html, body {
 	// data file with markers (could also be a PHP file for dynamic markers)
 	var newDate = new Date;				
 	var markerFile = '/mapping/json?time=' + newDate.getTime() +'&{{qs|safe|escape}}';	
+    var sectorFile = '/mapping/sectorjson?time=' + newDate.getTime() +'&{{qs|safe|escape}}';
  	//alert('aaa{{qs}}');
 	// set default map properties
 	var defaultLatlng = new google.maps.LatLng(51.65,-9.00);
@@ -120,9 +121,38 @@ html, body {
 		
 		// load markers
 		loadMarkers();
+        loadSectors();
 	}
  
     alldata = ''
+
+	/**
+	 * Load markers via ajax request from server
+	 */
+	function loadSectors(){
+ 		alert('loadSectors')
+ 		// load marker jSon data	
+ 		alert(sectorFile)	;
+		$.getJSON(sectorFile, function(data) {
+			//alert('after getjson')
+			//// loop all the markers
+			alert(data.markers)
+            cnt = data.count;
+            $('#count').html('<p>' + cnt + '</p>');
+            alldata = data.markers;
+            //alert(alldata[1]['voip']);
+            
+			$.each(data.markers, function(i,item){
+				alert('after each')
+				// add marker to map
+				//loadMarker(item);	
+
+			});
+		});	
+	}
+
+
+
 
 	/**
 	 * Load markers via ajax request from server
