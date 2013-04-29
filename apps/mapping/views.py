@@ -357,8 +357,8 @@ def filter_data(request):
             except Exception, ex:
                 print ex        
             activephones = list(data.values_list('customer_id', flat=True))
-            print len(activephones)      
-            print 'bbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+            #print len(activephones)      
+            
             
     except Exception, ex:
         print ex
@@ -399,7 +399,7 @@ def getjson(request):
         
     markers['count'] = len(rows)
     markers['markers'] = rows
-   
+    print (rows)
     markers = anyjson.serialize(markers)
 
     return render(request, 'mapping/json.html', {
@@ -505,7 +505,7 @@ def getdata(request):
     #rows = sorted(rows)
     markers['markers'] = rows
     markers = anyjson.serialize(markers)
-    #print markers
+    print markers
     return render(request, 'mapping/data.html', {
         "data":rows
     })

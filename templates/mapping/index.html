@@ -162,7 +162,7 @@ html, body {
 			//alert(data.markers);
             cnt = data.count;
             //$('#count').html('<p>' + cnt + '</p>');
-            alldata = data.markers;
+            //alldata = data.markers;
             ////alert(alldata[1]['voip']);
             
 			$.each(data.markers, function(i,item){
@@ -191,7 +191,9 @@ html, body {
             cnt = data.count;
             $('#count').html('<p>' + cnt + '</p>');
             alldata = data.markers;
-            ////alert(alldata[1]['voip']);
+            console.log('loadmarkers');
+            console.log(alldata);
+            //console.log(alldata[0]['voip']);
             
 			$.each(data.markers, function(i,item){
 				////alert('after each')
@@ -203,13 +205,17 @@ html, body {
 	}
 
     function getobject(id){
-    
-    for(var k in alldata) {
-          if (alldata[k]['id'] == id) {
-            return alldata[k];
-        
-          }
-    }   
+        console.log(id);
+        console.log(alldata);
+        for(var k in alldata) {
+              console.log('inside for');
+              console.log(k);
+              if (alldata[k]['id'] == id) {
+                //console.log('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+                return alldata[k];
+            
+              }
+        }   
     }
 
 
@@ -217,20 +223,10 @@ html, body {
 	 * Load marker to map
 	 */
 	function loadSector(markerData){
-		////alert(markerData['lat']);
-		// create new marker location
-		//console.log(markerData['lat'] + ', ' +  markerData['long'])
 		var myLatlng = new google.maps.LatLng(markerData['lat'], markerData['long']);
 		img = imagegreen;
-        //alert(markerData['color']);
-        //alert("after color");
-        //drawCellWithTA(map, markerData['lat'], markerData['long'], markerData['direction'], markerData['angle'], markerData['distance'], markerData['color']);
-        //drawCellWithTA(map, 52.707174, -5.813648, 90.0, 180.0, 20.0);
         drawCellWithDirection(map,  parseFloat(markerData['lat']), parseFloat(markerData['long']), parseInt(markerData['direction']), parseInt(markerData['angle']),parseInt( markerData['distance']),  markerData['color']);
-        //drawCellWithTA(map, markerData['lat'], markerData['long'], markerData['direction'], markerData['angle'], markerData['distance']);
-       
-    //drawCellWithTA(map, 52.707174, -8.813648, 90.0, 180.0, 50.0);
-   
+
     }
 
 
@@ -241,7 +237,7 @@ html, body {
 	function loadMarker(markerData){
 		////alert(markerData['lat']);
 		// create new marker location
-		//console.log(markerData['lat'] + ', ' +  markerData['long'])
+		console.log(markerData['id'] + ', ' + markerData['lat'] + ', ' +  markerData['long'])
 		var myLatlng = new google.maps.LatLng(markerData['lat'], markerData['long']);
 		img = imagegreen;
 		if (markerData['data1'] == "0")
@@ -297,15 +293,15 @@ html, body {
 		////alert('after marker');
 		// add marker to list used later to get content and additional marker information
 		markerList[marker.id] = marker;
-
+        console.log(marker.id);
 		// add event listener when marker is clicked
 		// currently the marker data contain a dataurl field this can of course be done different
 		google.maps.event.addListener(marker, 'click', function() {
 			
 			// show marker when clicked
 			showMarker(marker.id, marker.title);
-            //console.log(getobject(marker.id));
-            console.log(marker.id);
+            ////console.log(getobject(marker.id));
+            //console.log(marker.id);
            
 		});
 
@@ -332,11 +328,13 @@ html, body {
 	 * Show marker info window
 	 */
 	function showMarker(markerId, markerTitle){
-		
+		console.log('showMarker');
 		// get marker information from marker list
 		var marker = markerList[markerId];
-		 //console.log(alldata);
-        thisobject = getobject(marker.id)
+;
+        console.log(markerId);
+        console.log('after markerid');
+        thisobject = getobject(markerId);
 		// check if marker was found
 		if( marker ){
 			// get marker detail information from server
