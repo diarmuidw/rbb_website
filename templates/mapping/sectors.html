@@ -38,12 +38,17 @@ html, body {
 <!-- Include google map lib --> 
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script> 
 <!-- script type="text/javascript" src="/site_media/static/js/rbbmapping.js?r=" +Math.random()*99999999></script -->  
+
+<script src='/site_media/static/js/ttcell.js?time=' + newDate.getTime()'></script>
+<script src='/site_media/static/js/cells.js?time=' + newDate.getTime()'></script>
+
+
 <script type="text/javascript"> 
 	// data file with markers (could also be a PHP file for dynamic markers)
 	var newDate = new Date;				
 	var markerFile = '/mapping/json?time=' + newDate.getTime() +'&{{qs|safe|escape}}';	
     var sectorFile = '/mapping/sectorjson?time=' + newDate.getTime() +'&{{qs|safe|escape}}';
- 	//alert('aaa{{qs}}');
+ 	////alert('aaa{{qs}}');
 	// set default map properties
 	var defaultLatlng = new google.maps.LatLng(51.65,-9.00);
 	
@@ -95,9 +100,9 @@ html, body {
 	 
 	// set error handler for jQuery AJAX requests
 	$.ajaxSetup({"error":function(XMLHttpRequest,textStatus, errorThrown) {   
-		alert(textStatus);
-		alert(errorThrown);
-		alert(XMLHttpRequest.responseText);
+		//alert(textStatus);
+		//alert(errorThrown);
+		//alert(XMLHttpRequest.responseText);
 	}});
 
 	// option for google map object
@@ -112,7 +117,7 @@ html, body {
 	 * Load Map
 	 */
 	function loadMap(){
-		//alert('loadmap')
+		////alert('loadmap')
 		// create new map make sure a DIV with id myMap exist on page
 		map = new google.maps.Map(document.getElementById("myMap"), myOptions);
 
@@ -121,36 +126,54 @@ html, body {
 		
 		// load markers
 		loadMarkers();
-        //loadSectors();
+        loadSectors();
+        loadRange();
+        
 	}
  
     alldata = ''
+    function loadRange(){
+    {{js|safe|escape}}
+  
 
+   
+    }
 	/**
 	 * Load markers via ajax request from server
 	 */
 	function loadSectors(){
- 		alert('loadSectors')
+ 		//alert('loadSectors')
  		// load marker jSon data	
- 		alert(sectorFile)	;
+ 		//alert(sectorFile)	;
 		$.getJSON(sectorFile, function(data) {
-			//alert('after getjson')
+			////alert('after getjson')
 			//// loop all the markers
-			alert(data.markers)
+			//alert(data.markers)
             cnt = data.count;
             $('#count').html('<p>' + cnt + '</p>');
             //alldata = data.markers;
-            //alert(alldata[1]['voip']);
+            ////alert(alldata[1]['voip']);
             
 			$.each(data.markers, function(i,item){
-				alert('after each')
+				//alert('after each')
 				// add marker to map
-				//loadMarker(item);	
+				loadSector(item);
 
 			});
 		});	
 	}
 
+
+	/**
+	 * Load marker to map
+	 */
+	function loadSector(markerData){
+       //alert('LoadSector');
+		var myLatlng = new google.maps.LatLng(markerData['lat'], markerData['long']);
+		img = imagegreen;
+        //drawCellWithDirection(map,  parseFloat(markerData['lat']), parseFloat(markerData['long']), parseInt(markerData['direction']), parseInt(markerData['angle']),parseInt( markerData['distance']),  markerData['color']);
+
+    }
 
 
 
@@ -158,21 +181,20 @@ html, body {
 	 * Load markers via ajax request from server
 	 */
 	function loadMarkers(){
- 		//alert('loadmarkers')
+ 		////alert('loadmarkers')
  		// load marker jSon data	
- 		//alert(markerFile)	
+ 		////alert(markerFile)	
 		$.getJSON(markerFile, function(data) {
-			//alert('after getjson')
+			////alert('after getjson')
 			//// loop all the markers
-			//alert(data.markers)
+			////alert(data.markers)
             cnt = data.count;
             $('#count').html('<p>' + cnt + '</p>');
             alldata = data.markers;
-            ////console.log(alldata);
-            
+            ////alert(alldata[1]['voip']);
             
 			$.each(data.markers, function(i,item){
-				//alert('after each')
+				////alert('after each')
 				// add marker to map
 				loadMarker(item);	
 
@@ -194,9 +216,9 @@ html, body {
 	 * Load marker to map
 	 */
 	function loadMarker(markerData){
-		//alert(markerData['lat']);
+		////alert(markerData['lat']);
 		// create new marker location
-		////console.log(markerData['lat'] + ', ' +  markerData['long'])
+		//console.log(markerData['lat'] + ', ' +  markerData['long'])
 		var myLatlng = new google.maps.LatLng(markerData['lat'], markerData['long']);
 		img = imagegreen;
 		if (markerData['data1'] == "0")
@@ -249,7 +271,7 @@ html, body {
 			//shadow: shadow
 
 		});
-		//alert('after marker');
+		////alert('after marker');
 		// add marker to list used later to get content and additional marker information
 		markerList[marker.id] = marker;
 
@@ -259,8 +281,8 @@ html, body {
 			
 			// show marker when clicked
 			showMarker(marker.id, marker.title);
-            ////console.log(getobject(marker.id));
-            //console.log(marker.id);
+            //console.log(getobject(marker.id));
+            console.log(marker.id);
            
 		});
 
@@ -290,7 +312,7 @@ html, body {
 		
 		// get marker information from marker list
 		var marker = markerList[markerId];
-		 ////console.log(alldata);
+		 //console.log(alldata);
         thisobject = getobject(marker.id)
 		// check if marker was found
 		if( marker ){
@@ -308,7 +330,7 @@ html, body {
 				infowindow.open(map,marker);
 			});	
 		}else{
-			alert('Error marker not found: ' + markerId);
+			//alert('Error marker not found: ' + markerId);
 		}
 	}	
 	 
@@ -366,13 +388,13 @@ html, body {
 				});
 				
 			}else if( status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT){
-				alert("Marker not found:" + status);
+				//alert("Marker not found:" + status);
 			}
 		});
 	}
  
 </script> 
- <META HTTP-EQUIV="refresh" CONTENT="120">
+ <META HTTP-EQUIV="refresh" CONTENT="120000">
 </head> 
  
 <body onload="loadMap()"> 

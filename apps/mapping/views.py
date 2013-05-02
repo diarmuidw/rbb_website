@@ -476,7 +476,170 @@ def viewmap(request):
     return render(request, 'mapping/map.html', {
         "json":markers, 'qs': qs
     })
+
+import sys, math
+sys.path.append('/usr/lib/python2.7/dist-packages')
+sys.path.append('/usr/share/pyshared/')
+
+
+from google_gis import SrtmTiff
+#import  google_map
+
+s = SrtmTiff('/home/ids/Development/srtm_mapping/srtm/srtm_35_02.tif')
+
     
+def generate_sector_diagram(sectornumber, orig_lon, orig_lat, direction, sweepangle, range_, tower_height):
+    R = 6378.1 #Radius of the Earth
+    brng = 0 #Bearing is 90 degrees converted to radians.
+    d = 3 #Distance in 
+
+    start_angle = direction - sweepangle/2.0;
+    end_angle = direction + sweepangle/2.0;
+
+    elev_orig = s.get_elevation(orig_lat, orig_lon) + tower_height
+    lat1 = math.radians(orig_lat) #Current lat point converted to radians
+    lon1 = math.radians(orig_lon) #Current long point converted to radians
+
+
+    #print elev_orig
+
+    coords = ''
+    coords = coords + "var sector%s = ["%sectornumber
+
+    north_lat = 0
+    north_lon = 0
+    north_d = 0
+    coords = coords + "new google.maps.LatLng(%s, %s),\n"%(orig_lat,orig_lon)
+    for brng in range(int(math.floor(start_angle)), int(math.ceil(end_angle)),1):
+        print brng, start_angle, direction, sweepangle
+        brng = brng * math.pi/180
+        previous_lon = 0
+        previous_lat = 0
+        still_visible = True
+        previous_elev = 0
+        max_elev = 0
+        previous_d = 0
+        for d in range(20,range_ *10):
+            
+            d = d/10.0
+            lat2 = math.asin( math.sin(lat1) * math.cos(d/R) + math.cos(lat1) * math.sin(d/R)*math.cos(brng))
+            
+            lon2 = lon1 + math.atan2(math.sin(brng) * math.sin(d/R) * math.cos(lat1), math.cos(d/R)-math.sin(lat1)*math.sin(lat2))
+            
+            lon2 = math.degrees(lon2)
+        
+            
+            lat2 = math.degrees(lat2)
+            #print(lat2)
+            try:
+                elev = s.get_elevation(lat2, lon2)
+            except:
+                elev = 0
+            if elev > max_elev and still_visible:
+                max_elev = elev
+
+            #and elev != -32768.0
+            if still_visible:
+                if (elev < elev_orig and elev <= max_elev )  or elev > previous_elev:
+                    still_visible = True
+                    previous_lon = lon2
+                    previous_lat = lat2
+                    previous_elev = elev
+                    previous_d = d
+                else:
+                    still_visible= False
+                
+        #\print(brng, d, lon2, lat2, elev)
+
+        if brng == 0.0:
+            north_lat = previous_lat 
+            north_lon = previous_lon
+            
+        #print(brng, previous_d, previous_lon, previous_lat, previous_elev)    
+          
+        #print("new google.maps.LatLng(%s, %s),"%(previous_lat,previous_lon))
+        coords = coords + "new google.maps.LatLng(%s, %s),\n"%(previous_lat,previous_lon)
+    coords = coords + "new google.maps.LatLng(%s, %s),\n"%(orig_lat,orig_lon)  
+    #coords = coords +  "new google.maps.LatLng(%s, %s),\n"%(north_lat,north_lon)
+    coords = coords +  "];"
+
+    return coords
+
+
+
+def generateSectorRangeOverlay():
+    print 'generateSectorRangeOverlay'
+    data = Sector.objects.all()
+    i = 0
+    js = ''
+    setmap = ''
+    cmd = '''var flightPath = new google.maps.Polyline({
+    path: sector%s,
+    strokeColor: '#%s',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+  })\n;
+flightPath.setMap(map);\n
+'''
+
+  
+    for d in data:
+        i = i +1
+        a = {}
+        a['name'] = "%s"%(   d.name)
+        a['long'] = d.gps_longitude
+        a['lat'] = d.gps_latitude
+        a['direction'] = d.direction
+        a['angle'] = d.angle
+        a['distance'] = d.distance
+        a['color'] = d.color
+        
+        coords = generate_sector_diagram(i,float(d.gps_longitude), float(d.gps_latitude), int(d.direction), int(d.angle), int(d.distance), 10)
+        js =  js + coords + '\n'
+        setmap = setmap + cmd%(i,d.color)
+    return js +'\n' +setmap
+    
+    
+
+
+@csrf_exempt   
+def viewsectors(request):
+    js = generateSectorRangeOverlay()
+    logger.debug('viewmap')
+    logger.debug( request.GET)
+    print dir(request.GET)
+    qs = ''
+    for k in request.GET.keys():
+        print k, request.GET[k]
+        qs = "%s&%s=%s"%(qs,k,request.GET[k])
+    print qs
+    data = filter_data(request)
+    #data = data.filter(sector_id__exact='AP-Skibb')
+
+    #data = Customer.objects.all()
+    markers = {}
+    rows = []
+    for d in data:
+        a = {}
+        a['name'] = "%s %s"%(   d.first_name, d.last_name)
+        a['long'] = d.gps_longitude
+        a['lat'] = d.gps_latitude
+        a['id'] = str(d.customer_id)
+        a['data1'] = str(1)
+        a['data2'] = str(2)
+        a['billing'] = str(d.billing_active)
+        a['ip'] = str(d.ip)
+        a['voip'] = str(d.voip_number)
+        rows.append(a)
+        
+    markers['count'] = len(rows)
+    markers['markers'] = rows
+   
+    markers = anyjson.serialize(markers)
+
+    return render(request, 'mapping/sectors.html', {
+        "json":markers, 'qs': qs, 'js':js
+    })
     
 @csrf_exempt   
 def getdata(request):
