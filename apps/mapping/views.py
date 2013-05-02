@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from mapping.forms import CustomerForm
 from mapping.models import Customer, Detail, Sector
-
+from django.conf import settings
 import anyjson
 
 import logging
@@ -485,7 +485,7 @@ sys.path.append('/usr/share/pyshared/')
 from google_gis import SrtmTiff
 #import  google_map
 
-s = SrtmTiff('/home/ids/Development/srtm_mapping/srtm/srtm_35_02.tif')
+s = SrtmTiff(settings.SRTM_FILE)
 
     
 def generate_sector_diagram(sectornumber, orig_lon, orig_lat, direction, sweepangle, range_, tower_height):
