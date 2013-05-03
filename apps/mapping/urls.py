@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^viewmap$', views.viewmap, name='viewmap'),
     url(r'^viewsectors$', views.viewsectors, name='viewsectors'),
     url(r'^phoneoutrun$', views.phoneoutrun, name='phoneoutrun'),
+    url(r'^chart$', views.chart, name='chart'),
 )
 
 

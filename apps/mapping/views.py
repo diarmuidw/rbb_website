@@ -600,7 +600,7 @@ flightPath.setMap(map);\n
     return js +'\n' +setmap
     
     
-
+   
 
 @csrf_exempt   
 def viewsectors(request):
@@ -768,5 +768,158 @@ def phoneoutrun(request):
 ##        
 ##    return allphones
 
+
+from math import radians, cos, sin, asin, atan,atan2, sqrt, pi, degrees, floor
+
+#def calcBearing(lat1, lon1, lat2, lon2):
+#    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+#    dLon = lon2 - lon1
+#    y = sin(dLon) * cos(lat2)
+#    x = cos(lat1) * sin(lat2) \
+#        - sin(lat1) * cos(lat2) * cos(dLon)
+#    return degrees(atan2(y, x))
+#
+#Bearing = calcBearing(start_lat, start_lon, end_lat, end_lon)
+#
+#
+#print "Bearing --> %s"%Bearing
+
+def calculate_initial_compass_bearing(lat1, lon1, lat2, lon2):
+    """
+    Calculates the bearing between two points.
+
+ 
+    :Parameters:
+      - `pointA: The tuple representing the latitude/longitude for the
+        first point. Latitude and longitude must be in decimal degrees
+      - `pointB: The tuple representing the latitude/longitude for the
+        second point. Latitude and longitude must be in decimal degrees
+
+    :Returns:
+      The bearing in degrees
+
+    :Returns Type:
+      float
+    """
+    pointA = (lat1,lon1)
+    pointB = (lat2, lon2)
+    if (type(pointA) != tuple) or (type(pointB) != tuple):
+        raise TypeError("Only tuples are supported as arguments")
+
+    lat1 = math.radians(pointA[0])
+    lat2 = math.radians(pointB[0])
+
+    diffLong = math.radians(pointB[1] - pointA[1])
+
+    x = math.sin(diffLong) * math.cos(lat2)
+    y = math.cos(lat1) * math.sin(lat2) - (math.sin(lat1)
+            * math.cos(lat2) * math.cos(diffLong))
+
+    initial_bearing = math.atan2(x, y)
+
+    # Now we have the initial bearing but math.atan2 return values
+    # from -180 to + 180 which is not what we want for a compass bearing
+    # The solution is to normalize the initial bearing as shown below
+    initial_bearing = math.degrees(initial_bearing)
+    compass_bearing = (initial_bearing + 360) % 360
+
+    return compass_bearing
+
+
+
+def haversine(lon1, lat1, lon2, lat2):
+    """
+    Calculate the great circle distance between two points 
+    on the earth (specified in decimal degrees)
+    """
+    # convert decimal degrees to radians 
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+    # haversine formula 
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    b = dlat/dlon
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
     
+    c = 2 * asin(sqrt(a)) 
+    km = 6367 * c
+    return km 
+
+
+def Generate_chart(start_lat, start_lon, end_lat, end_lon):
+    R = 6378.1
+    try:
+        hav =  haversine(start_lon, start_lat, end_lon, end_lat)
+    except Exception, ex:
+        print ex
+        hav = 0
+    print "Distance --> %s"%hav
+    Bearing2 = calculate_initial_compass_bearing(start_lat, start_lon, end_lat, end_lon)
+    print "Bearing2 --> %s"%Bearing2
+    brng = radians(Bearing2)
+    coords = []
+    d = 0
+    lat1 = math.radians(start_lat) #Current lat point converted to radians
+    lon1 = math.radians(start_lon) #Current long point converted to radians
+    print lat1
+    print lon1
+    
+    interval = 1
+    d = interval
+    while d < hav:
+        print d
+        lat2 = math.asin( math.sin(lat1) * math.cos(d/R) + math.cos(lat1) * math.sin(d/R)*math.cos(brng))
+        lon2 = lon1 + math.atan2(math.sin(brng) * math.sin(d/R) * math.cos(lat1), math.cos(d/R)-math.sin(lat1)*math.sin(lat2))
+        lon2 = math.degrees(lon2)
+        lat2 = math.degrees(lat2)
+        #print(lat2)
+        try:
+            elev = s.get_elevation(lat2, lon2)
+        except Exception, ex:
+            print ex
+            elev = 0
+            pass 
+        #print '%s, %s, %s, %s'%(lat2, lon2, d, elev)
+        
+        coord = {}
+        coord['d'] = math.ceil(d * 100.0)/100.0
+        coord['h'] = floor(elev)
+        coords.append(coord)
+        d = d + interval
+    #print coords
+    js = "['x', 'height'],\n"
+
+    #put in first coord
+    elev = s.get_elevation(start_lat, start_lon)
+    if  floor(elev) == -32768.0:
+        elev = 0
+    js = js + "['%s', %s],\n"%(0, floor(elev))
+    #print js
+    for c in coords:
+        if c['h'] == -32768.0:
+            c['h'] = 0
+        js = js + "['%s',   %s],\n"%(c['d'], c['h'])
+
+    js = js + ']);'
+
+    return js
+
+import google_chart
+
+@csrf_exempt   
+def chart(request):
+    print 'starting chart'
+    lat_start = request.GET['lat1']
+    lng_start = request.GET['lon1']
+    lat_end = request.GET['lat2']
+    lng_end = request.GET['lon2']
+    
+    try:
+        js = Generate_chart(float(lat_start),float(lng_start), float(lat_end),float(lng_end));
+    except Exception, ex:
+        print ex
+    
+    html = google_chart.start_html + js + google_chart.end_html
    
+    return render(request, 'mapping/chart.html', {
+        "html1":html
+    }) 
