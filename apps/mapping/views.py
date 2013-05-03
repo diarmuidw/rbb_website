@@ -8,6 +8,19 @@ import anyjson
 
 import logging
 
+import google_chart
+import sys, math
+from math import radians, cos, sin, asin, atan,atan2, sqrt, pi, degrees, floor
+
+from google_gis import SrtmTiff
+s = SrtmTiff(settings.SRTM_FILE)
+
+
+
+
+#import  google_map
+
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -128,8 +141,17 @@ def search(request):
                 last_check_in = 'off'
                 pass 
                         
+            display_sectors = 'off'
+            try:
+               
+                display_sectors = request.POST['display_sectors']
+               
+            except:
+                display_sectors = 'off'
+                pass 
+
             
-            qs = 'last_check_in=%s&phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(last_check_in,phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
+            qs = 'display_sectors=%s&last_check_in=%s&phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(display_sectors,last_check_in,phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
             logger.debug( qs)
             return render(request, 'mapping/index.html', {
             'form': form, 'qs': qs
@@ -411,9 +433,9 @@ def getjson(request):
 @csrf_exempt   
 def getsectorjson(request):
     
-    logger.debug('getjson')
+    logger.debug('getsectorjson')
     logger.debug( request.GET)
-    
+    display_sectors = request.GET['display_sectors']
     data = Sector.objects.all()
     markers = {}
     rows = []
@@ -431,9 +453,11 @@ def getsectorjson(request):
         
     markers['count'] = len(rows)
     markers['markers'] = rows
-   
+    
     markers = anyjson.serialize(markers)
     #print markers
+    if display_sectors == 'off':
+        markers = []
     return render(request, 'mapping/json.html', {
         "json":markers
     })
@@ -478,15 +502,7 @@ def viewmap(request):
         "json":markers, 'qs': qs
     })
 
-import sys, math
-sys.path.append('/usr/lib/python2.7/dist-packages')
-sys.path.append('/usr/share/pyshared/')
 
-
-from google_gis import SrtmTiff
-#import  google_map
-
-s = SrtmTiff(settings.SRTM_FILE)
 
     
 def generate_sector_diagram(sectornumber, orig_lon, orig_lat, direction, sweepangle, range_, tower_height):
@@ -770,7 +786,6 @@ def phoneoutrun(request):
 ##    return allphones
 
 
-from math import radians, cos, sin, asin, atan,atan2, sqrt, pi, degrees, floor
 
 #def calcBearing(lat1, lon1, lat2, lon2):
 #    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
@@ -842,7 +857,7 @@ def haversine(lon1, lat1, lon2, lat2):
     a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
     
     c = 2 * asin(sqrt(a)) 
-    km = 6367 * c
+    km = 6367.1 * c
     return km 
 
 
@@ -864,7 +879,7 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
     #print lat1
     #print lon1
     
-    interval = 1
+    interval = settings.ELEVATION_CHART_INTERVAL
     d = interval
     while d < hav:
         #print d
@@ -891,12 +906,14 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
 
     #put in first coord
     elev = s.get_elevation(start_lat, start_lon)
-    if  floor(elev) == -32768.0:
+    if  elev < 0:
         elev = 0
     js = js + "['%s', %s],\n"%(0, floor(elev))
     ##print js
     for c in coords:
-        if c['h'] == -32768.0:
+        if c['h'] < 0:
+            c['h'] = 0
+        if c['h'] > 1000:
             c['h'] = 0
         js = js + "['%s',   %s],\n"%(c['d'], c['h'])
 
@@ -904,7 +921,7 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
 
     return js
 
-import google_chart
+
 
 @csrf_exempt   
 def chart(request):

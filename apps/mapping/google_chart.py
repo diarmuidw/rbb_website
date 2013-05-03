@@ -30,8 +30,7 @@ end_html = '''
         // Create and draw the visualization.
         new google.visualization.LineChart(document.getElementById('visualization')).
             draw(data, {curveType: "function",
-                        width: 900, height: 200,
-                        vAxis: {maxValue: 200}}
+                        width: 900, }
                 );
       }
       

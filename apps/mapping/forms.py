@@ -174,4 +174,5 @@ class CustomerForm(forms.Form):
     phone_active = forms.ChoiceField(choices=PHONE_CHOICES, required = False)
     phone_out = forms.ChoiceField(choices=PHONE_CHOICES, required = False)
     last_check_in = forms.ChoiceField(choices=PHONE_RANGE_CHOICES, required = False)
+    display_sectors = forms.BooleanField(required=False)
     
