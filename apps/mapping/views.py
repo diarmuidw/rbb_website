@@ -144,7 +144,7 @@ def search(request):
     
 def filter_data(request):
     
-    print 'filter_data'
+    #print 'filter_data'
     #data = Customer.objects.filter(gps_longitude__lte = -9.0).filter(voip_number__startswith='0')
     data = Customer.objects.all()
     try:
@@ -235,12 +235,13 @@ def filter_data(request):
             now = datetime.now()
             an_hour_ago = now - timedelta(hours=int(phone_active))
             #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
-            #print details
+            ##print details
             try:
                 data = data.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
-                #print data
+                ##print data
             except Exception, ex:
                 print ex
+                pass
     except:
         pass  
 
@@ -250,22 +251,22 @@ def filter_data(request):
         phone_out = request.GET['phone_out']
         logger.debug( "phone_out %s "%phone_out)
         if phone_out != 'off':
-            print 'doing phone out'
+            #print 'doing phone out'
             from datetime import datetime, timedelta
             now = datetime.now()
-            print 'doing active phones'
+            #print 'doing active phones'
             time_period = now - timedelta(hours=int(phone_out))
             try:
                 activedata = Customer.objects.filter(detail__time_stamp__range=(time_period, now)).distinct()
-                #print activedata
+                ##print activedata
             except Exception, ex:
                 print ex       
-            print 'doing week phones'
+            #print 'doing week phones'
             #now find phones active in the past week
             a_week_ago=  now - timedelta(hours=24*7)
             try:
                 active_in_past_week = Customer.objects.filter(detail__time_stamp__range=(a_week_ago, now)).distinct()
-                #print active_in_past_week
+                ##print active_in_past_week
             except Exception, ex:
                 print ex    
                 
@@ -273,23 +274,23 @@ def filter_data(request):
 ##             
 ##            try:
 ##                dd = Customer.objects.filter(detail__time_stamp__range=(a_week_ago, time_period)).distinct()
-##                #print activedata
+##                ##print activedata
 ##            except Exception, ex:
 ##                print ex   
                 
-            print 'convert to list'
+            #print 'convert to list'
             try:
                 activephones = list(activedata.values_list('customer_id', flat=True))
             except Exception, ex:
                 print ex
-            print 'doing weekphones'
+            #print 'doing weekphones'
             weekphones = list(active_in_past_week.values_list('customer_id', flat=True))
             #ddd = list(dd.values_list('customer_id', flat=True))
             
-            print len(activephones)
-            print len(weekphones)
-            #print len(ddd)
-            print 'after active phones'
+            #print len(activephones)
+            #print len(weekphones)
+            ##print len(ddd)
+            #print 'after active phones'
             
             for x in activephones:
                 try:    
@@ -306,7 +307,7 @@ def filter_data(request):
                        
             data = data.filter(customer_id__in=[o for o in weekphones])
             
-            print 'after exclude'
+            #print 'after exclude'
     except Exception, ex:
         print ex
         pass  
@@ -316,7 +317,7 @@ def filter_data(request):
         last_check_in = request.GET['last_check_in']
         logger.debug( "last_check_in %s "%last_check_in)
         if last_check_in != 'off':
-            print 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            #print 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
             from datetime import datetime, timedelta
             now = datetime.now()
             start_range = 0
@@ -348,16 +349,16 @@ def filter_data(request):
             elif last_check_in == '96':
                 start_range = now - timedelta(hours=int(96))
                 end_range = now - timedelta(hours=int(48))
-            print 'start_range %s'%start_range
-            print 'end_range  %s'%end_range
+            #print 'start_range %s'%start_range
+            #print 'end_range  %s'%end_range
             
             try:
                 data = Customer.objects.filter(latest__time_stamp__range=(start_range, end_range))
-                #print data
+                ##print data
             except Exception, ex:
                 print ex        
             activephones = list(data.values_list('customer_id', flat=True))
-            #print len(activephones)      
+            ##print len(activephones)      
             
             
     except Exception, ex:
@@ -368,8 +369,8 @@ def filter_data(request):
     
     
     l =  list(data.values_list('customer_id', flat=True))
-    print len(l)
-    #print l
+    #print len(l)
+    ##print l
     return data    
     
 @csrf_exempt   
@@ -399,7 +400,7 @@ def getjson(request):
         
     markers['count'] = len(rows)
     markers['markers'] = rows
-    print (rows)
+    #print (rows)
     markers = anyjson.serialize(markers)
 
     return render(request, 'mapping/json.html', {
@@ -432,7 +433,7 @@ def getsectorjson(request):
     markers['markers'] = rows
    
     markers = anyjson.serialize(markers)
-    print markers
+    #print markers
     return render(request, 'mapping/json.html', {
         "json":markers
     })
@@ -443,12 +444,12 @@ def viewmap(request):
     
     logger.debug('viewmap')
     logger.debug( request.GET)
-    print dir(request.GET)
+    #print dir(request.GET)
     qs = ''
     for k in request.GET.keys():
-        print k, request.GET[k]
+        #print k, request.GET[k]
         qs = "%s&%s=%s"%(qs,k,request.GET[k])
-    print qs
+    #print qs
     data = filter_data(request)
     #data = data.filter(sector_id__exact='AP-Skibb')
 
@@ -501,7 +502,7 @@ def generate_sector_diagram(sectornumber, orig_lon, orig_lat, direction, sweepan
     lon1 = math.radians(orig_lon) #Current long point converted to radians
 
 
-    #print elev_orig
+    ##print elev_orig
 
     coords = ''
     coords = coords + "var sector%s = ["%sectornumber
@@ -511,7 +512,7 @@ def generate_sector_diagram(sectornumber, orig_lon, orig_lat, direction, sweepan
     north_d = 0
     coords = coords + "new google.maps.LatLng(%s, %s),\n"%(orig_lat,orig_lon)
     for brng in range(int(math.floor(start_angle)), int(math.ceil(end_angle)),1):
-        print brng, start_angle, direction, sweepangle
+        #print brng, start_angle, direction, sweepangle
         brng = brng * math.pi/180
         previous_lon = 0
         previous_lat = 0
@@ -530,7 +531,7 @@ def generate_sector_diagram(sectornumber, orig_lon, orig_lat, direction, sweepan
         
             
             lat2 = math.degrees(lat2)
-            #print(lat2)
+            ##print(lat2)
             try:
                 elev = s.get_elevation(lat2, lon2)
             except:
@@ -549,15 +550,15 @@ def generate_sector_diagram(sectornumber, orig_lon, orig_lat, direction, sweepan
                 else:
                     still_visible= False
                 
-        #\print(brng, d, lon2, lat2, elev)
+        #\#print(brng, d, lon2, lat2, elev)
 
         if brng == 0.0:
             north_lat = previous_lat 
             north_lon = previous_lon
             
-        #print(brng, previous_d, previous_lon, previous_lat, previous_elev)    
+        ##print(brng, previous_d, previous_lon, previous_lat, previous_elev)    
           
-        #print("new google.maps.LatLng(%s, %s),"%(previous_lat,previous_lon))
+        ##print("new google.maps.LatLng(%s, %s),"%(previous_lat,previous_lon))
         coords = coords + "new google.maps.LatLng(%s, %s),\n"%(previous_lat,previous_lon)
     coords = coords + "new google.maps.LatLng(%s, %s),\n"%(orig_lat,orig_lon)  
     #coords = coords +  "new google.maps.LatLng(%s, %s),\n"%(north_lat,north_lon)
@@ -568,7 +569,7 @@ def generate_sector_diagram(sectornumber, orig_lon, orig_lat, direction, sweepan
 
 
 def generateSectorRangeOverlay():
-    print 'generateSectorRangeOverlay'
+    #print 'generateSectorRangeOverlay'
     data = Sector.objects.all()
     i = 0
     js = ''
@@ -607,12 +608,12 @@ def viewsectors(request):
     js = generateSectorRangeOverlay()
     logger.debug('viewmap')
     logger.debug( request.GET)
-    print dir(request.GET)
+    #print dir(request.GET)
     qs = ''
     for k in request.GET.keys():
-        print k, request.GET[k]
+        #print k, request.GET[k]
         qs = "%s&%s=%s"%(qs,k,request.GET[k])
-    print qs
+    #print qs
     data = filter_data(request)
     #data = data.filter(sector_id__exact='AP-Skibb')
 
@@ -668,7 +669,7 @@ def getdata(request):
     #rows = sorted(rows)
     markers['markers'] = rows
     markers = anyjson.serialize(markers)
-    print markers
+    #print markers
     return render(request, 'mapping/data.html', {
         "data":rows
     })
@@ -686,24 +687,24 @@ def outlasthour(request):
  
     an_hour_ago = now - timedelta(hours=1)
     #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
-    #print details
+    ##print details
     #this gets all phones active in last hour
     try:
         data = Customer.objects.filter(detail__time_stamp__range=(an_hour_ago, now)).distinct()
-        #print data
+        ##print data
     except Exception, ex:
         print ex        
     activephones = list(data.values_list('customer_id', flat=True))
     
-    #print activephones
-    print len(activephones)
+    ##print activephones
+    #print len(activephones)
 
     try:
         outdata = Customer.objects.filter(voip_number__startswith='0').exclude(customer_id__in=[o for o in activephones])
-        print outdata
+        #print outdata
     except Exception, ex:
         print ex
-    print len(outdata)
+    #print len(outdata)
     
     markers = {}
     rows = []
@@ -719,14 +720,14 @@ def outlasthour(request):
         a['ip'] = str(d.ip)
         a['voip'] = str(d.voip_number)
         rows.append(a)
-        #print a['id'], a['long'], a['lat']
+        ##print a['id'], a['long'], a['lat']
     
     markers['count'] = len(rows)
     markers['markers'] = rows
     markers = anyjson.serialize(markers)
     
-    #print markers
-    #print rows
+    ##print markers
+    ##print rows
     return render(request, 'mapping/json.html', {
         "json":markers
     })
@@ -742,25 +743,25 @@ def phoneoutrun(request):
 
     an_hour_ago = now - timedelta(hours=16)
     #details = Detail.objects.filter(time_stamp__range=(an_hour_ago, now))
-    #print details
+    ##print details
     #this gets all phones active in last hour
     try:
         data = Customer.objects.filter(latest__time_stamp__range=(an_hour_ago, now))
-        #print data
+        ##print data
     except Exception, ex:
         print ex        
     activephones = list(data.values_list('customer_id', flat=True))
-    print len(activephones)
-##    #print activephones
-##    print len(activephones)
-##    print 'phoneoutrun'
+    #print len(activephones)
+##    ##print activephones
+##    #print len(activephones)
+##    #print 'phoneoutrun'
 ##    try:
 ##        allphones = Customer.objects.filter(voip_number__startswith='0')#.exclude(customer_id__in=[o for o in activephones])
-##        #print outdata
+##        ##print outdata
 ##    except Exception, ex:
 ##        print ex
-##    print 
-##    print 'len of allphones = %s'%len(allphones)    
+##    #print 
+##    #print 'len of allphones = %s'%len(allphones)    
 ##    
 ##    for p in allphones:
 ##        #now do calcs for each phone
@@ -782,7 +783,7 @@ from math import radians, cos, sin, asin, atan,atan2, sqrt, pi, degrees, floor
 #Bearing = calcBearing(start_lat, start_lon, end_lat, end_lon)
 #
 #
-#print "Bearing --> %s"%Bearing
+##print "Bearing --> %s"%Bearing
 
 def calculate_initial_compass_bearing(lat1, lon1, lat2, lon2):
     """
@@ -852,40 +853,40 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
     except Exception, ex:
         print ex
         hav = 0
-    print "Distance --> %s"%hav
+    #print "Distance --> %s"%hav
     Bearing2 = calculate_initial_compass_bearing(start_lat, start_lon, end_lat, end_lon)
-    print "Bearing2 --> %s"%Bearing2
+    #print "Bearing2 --> %s"%Bearing2
     brng = radians(Bearing2)
     coords = []
     d = 0
     lat1 = math.radians(start_lat) #Current lat point converted to radians
     lon1 = math.radians(start_lon) #Current long point converted to radians
-    print lat1
-    print lon1
+    #print lat1
+    #print lon1
     
     interval = 1
     d = interval
     while d < hav:
-        print d
+        #print d
         lat2 = math.asin( math.sin(lat1) * math.cos(d/R) + math.cos(lat1) * math.sin(d/R)*math.cos(brng))
         lon2 = lon1 + math.atan2(math.sin(brng) * math.sin(d/R) * math.cos(lat1), math.cos(d/R)-math.sin(lat1)*math.sin(lat2))
         lon2 = math.degrees(lon2)
         lat2 = math.degrees(lat2)
-        #print(lat2)
+        ##print(lat2)
         try:
             elev = s.get_elevation(lat2, lon2)
         except Exception, ex:
             print ex
             elev = 0
             pass 
-        #print '%s, %s, %s, %s'%(lat2, lon2, d, elev)
+        ##print '%s, %s, %s, %s'%(lat2, lon2, d, elev)
         
         coord = {}
         coord['d'] = math.ceil(d * 100.0)/100.0
         coord['h'] = floor(elev)
         coords.append(coord)
         d = d + interval
-    #print coords
+    ##print coords
     js = "['x', 'height'],\n"
 
     #put in first coord
@@ -893,7 +894,7 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
     if  floor(elev) == -32768.0:
         elev = 0
     js = js + "['%s', %s],\n"%(0, floor(elev))
-    #print js
+    ##print js
     for c in coords:
         if c['h'] == -32768.0:
             c['h'] = 0
@@ -907,7 +908,7 @@ import google_chart
 
 @csrf_exempt   
 def chart(request):
-    print 'starting chart'
+    #print 'starting chart'
     lat_start = request.GET['lat1']
     lng_start = request.GET['lon1']
     lat_end = request.GET['lat2']

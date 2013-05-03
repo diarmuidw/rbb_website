@@ -72,6 +72,9 @@ html, body {
 	
 	// variable for map
 	var map;
+
+    //line bwetten two points
+    var line ;
 	
 	// variable for marker info window
 	var infowindow	
@@ -161,8 +164,15 @@ html, body {
         {
             alert( "Latitude: "+marker1.getPosition().lat()+" "+", longitude: "+marker1.getPosition().lng() );     
             x =new google.maps.LatLng(marker1.getPosition().lat(),marker1.getPosition().lng());
-        });
-
+            line.setMap(null);
+           line = new google.maps.Polyline({
+                path: [x,y],
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+                map: map
+            });
+         });
 
         marker = new google.maps.Marker(
         {
@@ -177,6 +187,22 @@ html, body {
         {
             alert( "Latitude: "+marker.getPosition().lat()+" "+", longitude: "+marker.getPosition().lng() ); 
             y =new google.maps.LatLng(marker.getPosition().lat(),marker.getPosition().lng());
+            line.setMap(null);
+           line = new google.maps.Polyline({
+                path: [x,y],
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+                map: map
+            });
+        });
+        
+        line = new google.maps.Polyline({
+            path: [x,y],
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+            map: map
         });
 
 
