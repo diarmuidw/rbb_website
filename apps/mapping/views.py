@@ -925,11 +925,15 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
 @csrf_exempt   
 def chart(request):
     logger.debug( 'starting chart')
-    print request.GET
+    
     lat_start = request.GET['lat1']
+    logger.debug(lat_start)
     lng_start = request.GET['lon1']
+    logger.debug(lng_start)
     lat_end = request.GET['lat2']
+    logger.debug(lat_end)
     lng_end = request.GET['lon2']
+    logger.debug(lng_end)
     logger.debug( 'chart - after requests')
     try:
         js = Generate_chart(float(lat_start),float(lng_start), float(lat_end),float(lng_end));
