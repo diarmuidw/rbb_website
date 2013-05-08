@@ -862,11 +862,12 @@ def haversine(lon1, lat1, lon2, lat2):
 
 
 def Generate_chart(start_lat, start_lon, end_lat, end_lon):
+    logger.debug('Generate_chart')
     R = 6378.1
     try:
         hav =  haversine(start_lon, start_lat, end_lon, end_lat)
     except Exception, ex:
-        print ex
+        logger.debug( ex)
         hav = 0
     #print "Distance --> %s"%hav
     Bearing2 = calculate_initial_compass_bearing(start_lat, start_lon, end_lat, end_lon)
@@ -878,7 +879,7 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
     lon1 = math.radians(start_lon) #Current long point converted to radians
     #print lat1
     #print lon1
-    
+    logger.debug('before interval')
     interval = settings.ELEVATION_CHART_INTERVAL
     d = interval
     while d < hav:
@@ -891,7 +892,7 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
         try:
             elev = s.get_elevation(lat2, lon2)
         except Exception, ex:
-            print ex
+            logger.debug( ex)
             elev = 0
             pass 
         ##print '%s, %s, %s, %s'%(lat2, lon2, d, elev)
