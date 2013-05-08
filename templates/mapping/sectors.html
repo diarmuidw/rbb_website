@@ -55,9 +55,9 @@ html, body {
 
     function open_in_new_tab(url )
     {
-      //url = url +'?lat1='+x.lat()+'&lon1='+x.lng()+'&lat2='+y.lat()+'&lon2='+y.lng();
+      url = url +'?lat1='+x.lat()+'&lon1='+x.lng()+'&lat2='+y.lat()+'&lon2='+y.lng();
       //alert(url);
-      url = url + '?lat1=51.575715&lon1=-8.88&lat2=51.57&lon2=-8.9989'
+      //url = url + '?lat1=51.575715&lon1=-8.88&lat2=51.57&lon2=-8.9989'
       var win=window.open(encodeURI(url), '_blank');
       win.focus();
     }
