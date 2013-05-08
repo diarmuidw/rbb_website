@@ -925,7 +925,7 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
 
 @csrf_exempt   
 def chart(request):
-    #print 'starting chart'
+    logger.debug( 'starting chart')
     lat_start = request.GET['lat1']
     lng_start = request.GET['lon1']
     lat_end = request.GET['lat2']
@@ -934,10 +934,10 @@ def chart(request):
     try:
         js = Generate_chart(float(lat_start),float(lng_start), float(lat_end),float(lng_end));
     except Exception, ex:
-        print ex
+        logger.debug( ex)
     
     html = google_chart.start_html + js + google_chart.end_html
-   
+    logger.debug(html)
     return render(request, 'mapping/chart.html', {
         "html1":html
     }) 
