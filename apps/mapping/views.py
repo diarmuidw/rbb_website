@@ -925,7 +925,7 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
 @csrf_exempt   
 def chart(request):
     logger.debug( 'starting chart')
-    
+    logger.debug( request.GET)
     lat_start = request.GET['lat1']
     logger.debug(lat_start)
     lng_start = request.GET['lon1']
