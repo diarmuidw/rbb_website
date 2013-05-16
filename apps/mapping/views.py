@@ -902,21 +902,29 @@ def Generate_chart(start_lat, start_lon, end_lat, end_lon):
         coord['h'] = floor(elev)
         coords.append(coord)
         d = d + interval
+    print 'print coords count', len(coords)
     ##print coords
-    js = "['x', 'height'],\n"
+    js = "['x','LOS', 'height'],\n"
 
     #put in first coord
     elev = s.get_elevation(start_lat, start_lon)
+    start_elev = elev
+    end_elev = coords[len(coords)-1]['h']
+    print start_elev, end_elev
+    #calc increment
+    increment = (end_elev - start_elev)/float(len(coords))
     if  elev < 0:
         elev = 0
-    js = js + "['%s', %s],\n"%(0, floor(elev))
+    js = js + "['%s', %s, %s],\n"%(0, start_elev , floor(elev))
     ##print js
+    numberofsteps = 0.0
     for c in coords:
         if c['h'] < 0:
             c['h'] = 0
         if c['h'] > 1000:
             c['h'] = 0
-        js = js + "['%s',   %s],\n"%(c['d'], c['h'])
+        numberofsteps = numberofsteps + 1
+        js = js + "['%s', %s,  %s],\n"%(c['d'],start_elev + increment*numberofsteps, c['h'])
 
     js = js + ']);'
 
