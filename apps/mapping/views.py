@@ -365,6 +365,9 @@ def filter_data(request):
         print ex
         pass  
     
+    olddata = data
+    print olddata
+    
     #now do phone range
     try:
         last_check_in = request.GET['last_check_in']
@@ -444,7 +447,7 @@ def filter_data(request):
             else:
                 end_range = now
             print start_range, end_range
-            print 'qqqqqqqqqqqqqqqqqqq'
+            
             try:
                 data = Customer.objects.filter(latest__time_stamp__range=(start_range, end_range))
                 ##print data
@@ -452,20 +455,19 @@ def filter_data(request):
                 print ex        
             activephones = list(data.values_list('customer_id', flat=True))
             ##print len(activephones)      
-            
-        
 
     except Exception, ex:
         print ex
         pass  
-    
+
+    lastreg = list(data.values_list('customer_id', flat=True))
+    data = olddata.filter(customer_id__in=[o for o in lastreg])
     
     
     l =  list(data.values_list('customer_id', flat=True))
-    #print len(l)
-    ##print l
-    return data    
-    
+
+    return data  
+
 @csrf_exempt   
 def getjson(request):
     
