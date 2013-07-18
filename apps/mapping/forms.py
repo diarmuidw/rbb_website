@@ -203,5 +203,5 @@ class CustomerForm(forms.Form):
     last_check_in_start_date = forms.CharField(required = False,label='Start Date (Reg)')
     last_check_in_start_time = forms.ChoiceField(choices=TIME_CHOICES, required = False,label='Start Time (Reg)')
     last_check_in_end_date = forms.CharField(required = False,label='End Date (Reg)')
-    last_check_in_end_time = forms.ChoiceField(choices=TIME_CHOICES, required = False,label='End Time (Reg)')
+    last_check_in_end_time = forms.ChoiceField(initial='23', choices=TIME_CHOICES, required = False,label='End Time (Reg)')
  
