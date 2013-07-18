@@ -1,4 +1,4 @@
-{% extends "site_base.html" %}
+{% extends "simple_base.html" %}
 
 {% load i18n %}
 {% load ifsetting_tag %}
@@ -432,7 +432,6 @@ html, body {
     <table>
     <tr>
     <td>
-    <input type="submit" value="Submit" />
 	<form action="/mapping/search" method="post">{% csrf_token %}
         {{ form.as_p }}
      <input type="submit" value="Submit" />
@@ -449,35 +448,25 @@ html, body {
     </td>
     </tr>
     </table>
+	
+    <div id="datetimepicker" class="input-append date">
+      <input type="text"></input>
+      <span class="add-on">
+        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+      </span>
+    </div>
+    
+    <script type="text/javascript">
+      $('#datetimepicker').datetimepicker({
+        format: 'dd/MM/yyyy hh:mm:ss',
+        language: 'pt-BR'
+      });
+    </script>
+    
 
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<link rel="stylesheet" href="/resources/demos/style.css" />
-<script>
-
-
- $(function() {
-$( "#id_last_check_in_start_date" ).datepicker({
-defaultDate: "-1w",
-dateFormat: "yy-mm-dd" ,
-changeMonth: true,
-numberOfMonths: 1,
-onClose: function( selectedDate ) {
-$( "#id_last_check_in_end_date" ).datepicker( "option", "minDate", selectedDate );
-}
-});
-$( "#id_last_check_in_end_date" ).datepicker({
-defaultDate: "-1w",
-changeMonth: true,
-dateFormat: "yy-mm-dd",
-numberOfMonths: 1,
-onClose: function( selectedDate ) {
-$( "#id_last_check_in_start_date" ).datepicker( "option", "maxDate", selectedDate );
-}
-});
-});
-</script>
-
- 
+    <script type="text/javascript">
+      $('#id_customer_name').datetimepicker({
+        format: 'dd/MM/yyyy hh:mm:ss'
+      });
+    </script>
 {% endblock %}

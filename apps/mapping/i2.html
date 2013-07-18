@@ -44,7 +44,7 @@ DATABASES = {
 # system time zone.
 TIME_ZONE = "Europe/Dublin"
 
-
+USE_TZ = True
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -133,7 +133,7 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     "pinax.core.context_processors.pinax_settings",
     
     "pinax.apps.account.context_processors.account",
-
+    "django.core.context_processors.tz",
 ]
 
 INSTALLED_APPS = [

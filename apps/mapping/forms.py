@@ -161,6 +161,31 @@ SECTOR_ID_CHOICES = (
     ('wcbs-sct2.1','wcbs-sct2.1')
 )
 
+TIME_CHOICES = (
+('0', '0'),
+('1', '1'),
+('2', '2'),
+('3', '3'),
+('4', '4'),
+('5', '5'),
+('6', '6'),
+('7', '7'),
+('8', '8'),
+('9', '9'),
+('10', '10'),
+('11', '11'),
+('12', '12'),
+('13', '13'),
+('14', '14'),
+('15', '15'),
+('16', '16'),
+('17', '17'),
+('18', '18'),
+('19', '19'),
+('20', '20'),
+('21', '21'),
+('22', '22'),
+('23', '23'))
 
 class CustomerForm(forms.Form):
     customer_name = forms.CharField(max_length=100, required=False)
@@ -173,6 +198,10 @@ class CustomerForm(forms.Form):
     no_gps = forms.BooleanField(required=False)
     phone_active = forms.ChoiceField(choices=PHONE_CHOICES, required = False)
     phone_out = forms.ChoiceField(choices=PHONE_CHOICES, required = False)
-    last_check_in = forms.ChoiceField(choices=PHONE_RANGE_CHOICES, required = False)
+    last_check_in = forms.ChoiceField(choices=PHONE_RANGE_CHOICES, required = False,label='Last Reg. Time')
     display_sectors = forms.BooleanField(required=False)
-    
+    last_check_in_start_date = forms.CharField(required = False,label='Start Date (Reg)')
+    last_check_in_start_time = forms.ChoiceField(choices=TIME_CHOICES, required = False,label='Start Time (Reg)')
+    last_check_in_end_date = forms.CharField(required = False,label='End Date (Reg)')
+    last_check_in_end_time = forms.ChoiceField(choices=TIME_CHOICES, required = False,label='End Time (Reg)')
+ 

@@ -1,25 +1,21 @@
-{% extends "site_base.html" %}
+<html>
+<head>
+<meta charset="utf-8" />
+<title>jQuery UI Datepicker - Default functionality</title>
 
-{% load i18n %}
-{% load ifsetting_tag %}
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen"
+     href="http://tarruda.github.com/bootstrap-datetimepicker/assets/css/bootstrap-datetimepicker.min.css">
 
-{% block head_title %}{% trans "Mapping" %}{% endblock %}
+</head>
 
-{% block javascript %}
-
-
-
-{% endblock %}
-
-
-
-{% block body %}
+<body>
     
     
 <style type="text/css"> 
 
 	/* Some basic happy style */
-	body{margin:50px 0px; padding:0px;text-align:center;}
+	body{margin:10px 0px; padding:0px;text-align:center;}
 	input {font-size:18px;}
 	#myMap{width: 1000px; height: 600px;margin:auto;margin-top:20px;}
 
@@ -45,33 +41,20 @@ html, body {
 
 </style>
  
-
-<link type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.base.css " rel="Stylesheet" />
-
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-
-
-
-<!-- Include google map lib --> 
-<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyBQIVj1NYP1X8Y_Igc_VxY67qFMhUq6jC0&sensor=true"></script>
-<!-- script type="text/javascript" src="/site_media/static/js/rbbmapping.js?r=" +Math.random()*99999999></script -->  
-
-<script src='/site_media/static/js/ttcell.js?time=' + newDate.getTime()'></script>
-<script src='/site_media/static/js/cells.js?time=' + newDate.getTime()'></script>
-
-<link rel="stylesheet" type="text/css" media="screen" href="http://tarruda.github.com/bootstrap-datetimepicker/assets/css/bootstrap-datetimepicker.min.css">
-
+<!-- Include jQuery lib for AJAX requests --> 
 <script type="text/javascript"
- src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js">
-</script>
-
+     src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js">
+    </script> 
     
+<!-- Include google map lib --> 
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script> 
+<!-- script type="text/javascript" src="/site_media/static/js/rbbmapping.js?r=" +Math.random()*99999999></script -->  
 <script type="text/javascript"> 
 	// data file with markers (could also be a PHP file for dynamic markers)
 	var newDate = new Date;				
 	var markerFile = '/mapping/json?time=' + newDate.getTime() +'&{{qs|safe|escape}}';	
     var sectorFile = '/mapping/sectorjson?time=' + newDate.getTime() +'&{{qs|safe|escape}}';
- 	////alert('aaa{{qs}}');
+ 	//alert('aaa{{qs}}');
 	// set default map properties
 	var defaultLatlng = new google.maps.LatLng(51.65,-9.00);
 	
@@ -123,9 +106,9 @@ html, body {
 	 
 	// set error handler for jQuery AJAX requests
 	$.ajaxSetup({"error":function(XMLHttpRequest,textStatus, errorThrown) {   
-		//alert(textStatus);
-		//alert(errorThrown);
-		//alert(XMLHttpRequest.responseText);
+		alert(textStatus);
+		alert(errorThrown);
+		alert(XMLHttpRequest.responseText);
 	}});
 
 	// option for google map object
@@ -140,7 +123,7 @@ html, body {
 	 * Load Map
 	 */
 	function loadMap(){
-		////alert('loadmap')
+		//alert('loadmap')
 		// create new map make sure a DIV with id myMap exist on page
 		map = new google.maps.Map(document.getElementById("myMap"), myOptions);
 
@@ -149,11 +132,7 @@ html, body {
 		
 		// load markers
 		loadMarkers();
-        loadSectors();
-
-       // drawCellWithTA(map, 51.707174, -9.813648, 270, 332, 20);
-        //drawCellWithTA(map, 1, 2, 2);	
-    
+        //loadSectors();
 	}
  
     alldata = ''
@@ -162,22 +141,22 @@ html, body {
 	 * Load markers via ajax request from server
 	 */
 	function loadSectors(){
- 		//alert('loadSectors')
+ 		alert('loadSectors')
  		// load marker jSon data	
- 		//alert(sectorFile)	;
+ 		alert(sectorFile)	;
 		$.getJSON(sectorFile, function(data) {
 			//alert('after getjson')
 			//// loop all the markers
-			//alert(data.markers);
+			alert(data.markers)
             cnt = data.count;
-            //$('#count').html('<p>' + cnt + '</p>');
+            $('#count').html('<p>' + cnt + '</p>');
             //alldata = data.markers;
-            ////alert(alldata[1]['voip']);
+            //alert(alldata[1]['voip']);
             
 			$.each(data.markers, function(i,item){
-				//alert('after each')
+				alert('after each')
 				// add marker to map
-				loadSector(item);	
+				//loadMarker(item);	
 
 			});
 		});	
@@ -190,22 +169,21 @@ html, body {
 	 * Load markers via ajax request from server
 	 */
 	function loadMarkers(){
- 		////alert('loadmarkers')
+ 		//alert('loadmarkers')
  		// load marker jSon data	
- 		////alert(markerFile)	
+ 		//alert(markerFile)	
 		$.getJSON(markerFile, function(data) {
-			////alert('after getjson')
+			//alert('after getjson')
 			//// loop all the markers
-			////alert(data.markers)
+			//alert(data.markers)
             cnt = data.count;
             $('#count').html('<p>' + cnt + '</p>');
             alldata = data.markers;
-            console.log('loadmarkers');
-            //console.log(alldata);
-            //console.log(alldata[0]['voip']);
+            ////console.log(alldata);
+            
             
 			$.each(data.markers, function(i,item){
-				////alert('after each')
+				//alert('after each')
 				// add marker to map
 				loadMarker(item);	
 
@@ -214,39 +192,22 @@ html, body {
 	}
 
     function getobject(id){
-        console.log(id);
-        //console.log(alldata);
-        for(var k in alldata) {
-              console.log('inside for');
-              console.log(k);
-              if (alldata[k]['id'] == id) {
-                //console.log('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
-                return alldata[k];
-            
-              }
-        }   
+    
+    for(var k in alldata) {
+          if (alldata[k]['id'] == id) {
+            return alldata[k];
+        
+          }
+    }   
     }
-
-
-	/**
-	 * Load marker to map
-	 */
-	function loadSector(markerData){
-		var myLatlng = new google.maps.LatLng(markerData['lat'], markerData['long']);
-		img = imagegreen;
-        drawCellWithDirection(map,  parseFloat(markerData['lat']), parseFloat(markerData['long']), parseInt(markerData['direction']), parseInt(markerData['angle']),parseInt( markerData['distance']),  markerData['color']);
-
-    }
-
-
 
 	/**
 	 * Load marker to map
 	 */
 	function loadMarker(markerData){
-		////alert(markerData['lat']);
+		//alert(markerData['lat']);
 		// create new marker location
-		//console.log(markerData['id'] + ', ' + markerData['lat'] + ', ' +  markerData['long'])
+		////console.log(markerData['lat'] + ', ' +  markerData['long'])
 		var myLatlng = new google.maps.LatLng(markerData['lat'], markerData['long']);
 		img = imagegreen;
 		if (markerData['data1'] == "0")
@@ -299,10 +260,10 @@ html, body {
 			//shadow: shadow
 
 		});
-		////alert('after marker');
+		//alert('after marker');
 		// add marker to list used later to get content and additional marker information
 		markerList[marker.id] = marker;
-        //console.log(marker.id);
+
 		// add event listener when marker is clicked
 		// currently the marker data contain a dataurl field this can of course be done different
 		google.maps.event.addListener(marker, 'click', function() {
@@ -337,13 +298,11 @@ html, body {
 	 * Show marker info window
 	 */
 	function showMarker(markerId, markerTitle){
-		console.log('showMarker');
+		
 		// get marker information from marker list
 		var marker = markerList[markerId];
-;
-        console.log(markerId);
-        console.log('after markerid');
-        thisobject = getobject(markerId);
+		 ////console.log(alldata);
+        thisobject = getobject(marker.id)
 		// check if marker was found
 		if( marker ){
 			// get marker detail information from server
@@ -360,7 +319,7 @@ html, body {
 				infowindow.open(map,marker);
 			});	
 		}else{
-			//alert('Error marker not found: ' + markerId);
+			alert('Error marker not found: ' + markerId);
 		}
 	}	
 	 
@@ -418,29 +377,51 @@ html, body {
 				});
 				
 			}else if( status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT){
-				//alert("Marker not found:" + status);
+				alert("Marker not found:" + status);
 			}
 		});
 	}
  
 </script> 
- 
+ <META HTTP-EQUIV="refresh" CONTENT="120">
 </head> 
  
 <body onload="loadMap()"> 
-	<!-- Title -->
+    <div id='acount'></div>
     <table>
     <tr>
     <td>
-    <input type="submit" value="Submit" />
 	<form action="/mapping/search" method="post">{% csrf_token %}
         {{ form.as_p }}
      <input type="submit" value="Submit" />
     </form>
-        <a href = '/mapping/data?time=123&{{qs|safe|escape}}' target='_blank' >Get Data</a>
-        <a href = '/mapping/viewmap?time=123&{{qs|safe|escape}}' target='_blank' >View Map</a>
-         <a href = '/mapping/viewsectors?time=123&{{qs|safe|escape}}' target='_blank' >Sectors</a>
-    <div id='count'></div>
+    
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
+    <script type="text/javascript"
+     src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js">
+    </script>
+    <script type="text/javascript"
+     src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js">
+    </script>
+    <script type="text/javascript"
+     src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.pt-BR.js">
+    </script>
+    <script type="text/javascript">
+      $('#datetimepicker').datetimepicker({
+        format: 'dd/MM/yyyy hh:mm:ss',
+        language: 'pt-BR'
+      });
+    </script>
+    
+        <div id="datetimepicker" class="input-append date">
+      <input type="text"></input>
+      <span class="add-on">
+        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+      </span>
+    </div>
+    
+
     </td>
     <td>
 	<!-- Map Placeholder -->
@@ -449,35 +430,5 @@ html, body {
     </td>
     </tr>
     </table>
-
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<link rel="stylesheet" href="/resources/demos/style.css" />
-<script>
-
-
- $(function() {
-$( "#id_last_check_in_start_date" ).datepicker({
-defaultDate: "-1w",
-dateFormat: "yy-mm-dd" ,
-changeMonth: true,
-numberOfMonths: 1,
-onClose: function( selectedDate ) {
-$( "#id_last_check_in_end_date" ).datepicker( "option", "minDate", selectedDate );
-}
-});
-$( "#id_last_check_in_end_date" ).datepicker({
-defaultDate: "-1w",
-changeMonth: true,
-dateFormat: "yy-mm-dd",
-numberOfMonths: 1,
-onClose: function( selectedDate ) {
-$( "#id_last_check_in_start_date" ).datepicker( "option", "maxDate", selectedDate );
-}
-});
-});
-</script>
-
- 
-{% endblock %}
+</body>
+</html>

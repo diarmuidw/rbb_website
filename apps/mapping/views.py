@@ -150,8 +150,39 @@ def search(request):
                 display_sectors = 'off'
                 pass 
 
+#form params for date range on phone reg 
+
+            last_check_in_start_date = ''
+            try:
+                last_check_in_start_date = request.POST['last_check_in_start_date']
+            except:
+                last_check_in_start_date = ''
+                pass 
+    
+            last_check_in_end_date = ''
+            try:
+                last_check_in_end_date = request.POST['last_check_in_end_date']
+            except:
+                last_check_in_end_date = ''
+                pass 
+
+            last_check_in_start_time = 0
+            try:
+                last_check_in_start_time = request.POST['last_check_in_start_time']
+            except:
+                last_check_in_start_time = 0
+                pass 
+    
+            last_check_in_end_time = 0
+            try:
+                last_check_in_end_time = request.POST['last_check_in_end_time']
+            except Exception, ex:
+                last_check_in_end_time = 0
+                print ex
+                pass
+            qs = 'last_check_in_start_date=%s&last_check_in_start_time=%s&last_check_in_end_date=%s&last_check_in_end_time=%s'%(last_check_in_start_date,last_check_in_start_time,last_check_in_end_date, last_check_in_end_time)
             
-            qs = 'display_sectors=%s&last_check_in=%s&phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(display_sectors,last_check_in,phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
+            qs = qs +'&' +'display_sectors=%s&last_check_in=%s&phone_out=%s&has_phone=%s&phone_active=%s&no_gps=%s&will_come_back=%s&customer_name=%s&billing_active=%s&show_online=%s&customer_id=%s&sector_id=%s'%(display_sectors,last_check_in,phone_out,has_phone,phone_active,no_gps,will_come_back,customer_name, billing_active,show_online,customer_id, sector_id)
             logger.debug( qs)
             return render(request, 'mapping/index.html', {
             'form': form, 'qs': qs
@@ -382,11 +413,51 @@ def filter_data(request):
             activephones = list(data.values_list('customer_id', flat=True))
             ##print len(activephones)      
             
-            
+        
+
     except Exception, ex:
         print ex
         pass  
     
+    #do a query based on the start and end date and time
+    try:
+        last_check_in_start_date = request.GET['last_check_in_start_date']
+        last_check_in_start_time = request.GET['last_check_in_start_time']
+        last_check_in_end_date = request.GET['last_check_in_end_date']
+        last_check_in_end_time = request.GET['last_check_in_end_time']
+        logger.debug( "last_check_in_start_date %s "%last_check_in_start_date)
+        if last_check_in_start_date != '':
+            #print 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            from datetime import datetime, timedelta
+            now = datetime.now()
+            start_range = 0
+            end_range = 0
+            start_range = now - timedelta(hours=0.25)
+            end_range = now
+           
+            import time
+            start_range = time.strptime(last_check_in_start_date + " " + last_check_in_start_time, "%Y-%m-%d %H")  
+            start_range = datetime.fromtimestamp(time.mktime(start_range))
+            if last_check_in_end_date != '':
+                end_range = time.strptime(last_check_in_end_date + " " + last_check_in_end_time, "%Y-%m-%d %H")  
+                end_range = datetime.fromtimestamp(time.mktime(end_range))
+            else:
+                end_range = now
+            print start_range, end_range
+            print 'qqqqqqqqqqqqqqqqqqq'
+            try:
+                data = Customer.objects.filter(latest__time_stamp__range=(start_range, end_range))
+                ##print data
+            except Exception, ex:
+                print ex        
+            activephones = list(data.values_list('customer_id', flat=True))
+            ##print len(activephones)      
+            
+        
+
+    except Exception, ex:
+        print ex
+        pass  
     
     
     
@@ -953,3 +1024,45 @@ def chart(request):
     return render(request, 'mapping/chart.html', {
         "html1":html
     }) 
+
+
+    
+@csrf_exempt   
+def test(request):
+    
+    logger.debug('viewmap')
+    logger.debug( request.GET)
+    #print dir(request.GET)
+    qs = ''
+    for k in request.GET.keys():
+        #print k, request.GET[k]
+        qs = "%s&%s=%s"%(qs,k,request.GET[k])
+    #print qs
+    data = filter_data(request)
+    #data = data.filter(sector_id__exact='AP-Skibb')
+
+    #data = Customer.objects.all()
+    markers = {}
+    rows = []
+    for d in data:
+        a = {}
+        a['name'] = "%s %s"%(   d.first_name, d.last_name)
+        a['long'] = d.gps_longitude
+        a['lat'] = d.gps_latitude
+        a['id'] = str(d.customer_id)
+        a['data1'] = str(1)
+        a['data2'] = str(2)
+        a['billing'] = str(d.billing_active)
+        a['ip'] = str(d.ip)
+        a['voip'] = str(d.voip_number)
+        rows.append(a)
+        
+    markers['count'] = len(rows)
+    markers['markers'] = rows
+   
+    markers = anyjson.serialize(markers)
+    form = CustomerForm() # An unbound form
+    return render(request, 'mapping/map2.html', {
+        "json":markers, 'qs': qs, 'form':form
+    })
+

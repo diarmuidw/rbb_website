@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^viewsectors$', views.viewsectors, name='viewsectors'),
     url(r'^phoneoutrun$', views.phoneoutrun, name='phoneoutrun'),
     url(r'^chart$', views.chart, name='chart'),
+    url(r'^test$', views.test, name='test'),
 )
 
 

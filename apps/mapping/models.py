@@ -47,6 +47,17 @@ class phoneout(models.Model):
     phone_2hour         = models.BooleanField(null=False, default=0)
     phone_6hour         = models.BooleanField(null=False, default=0)  
     phone_12hour        = models.BooleanField(null=False, default=0)  
+
+class badpings(models.Model):
+    customer            = models.ForeignKey(Customer, db_index=True)
+    accesspoint         = models.IntegerField(null=False, unique=False, db_index=False)
+    accesspoint_name    = models.CharField(max_length=1000, null=False)
+    time_stamp		    = models.DateTimeField(auto_now_add=True)
+    min_ping            = models.FloatField(null=True)
+    max_ping            = models.FloatField(null=True)
+    num_ping            = models.FloatField(null=True)
+    percent_bad_ping    = models.FloatField(null=True)
+  
   
 class latest(models.Model):
     customer            = models.ForeignKey(Customer, db_index=True)
