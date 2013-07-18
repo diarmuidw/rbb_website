@@ -170,7 +170,6 @@ INSTALLED_APPS = [
     
     # RBB
     "mapping",
-    "datetimewidget",
 ]
 
 FIXTURE_DIRS = [
